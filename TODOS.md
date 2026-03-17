@@ -11,20 +11,22 @@ Since this is a solo project in a heavy alpha state, this is where I'm tracking 
 * \[x\] Multi-OS compatibility (Windows, macOS, Linux)  
 * \[x\] Implement support for multi-line up/down arrow history in REPL (readline) 
 * \[x\] Fix multiple arguments failing in functions (comma parsing bug)
-
 ## **📦 Package Manager (Forge)**
 
-* \[ \] Zero-dependency CLI structure  
-* \[ \] Download Soft Traits (Python wheels) via PyPI JSON API  
-* \[ \] Extract and store traits locally in \~/.ethos/traits/  
-* \[ \] Add update and remove commands for installed traits
+* [x] Zero-dependency CLI structure  
+* [ ] Support installing Python "Soft Traits" via pip sub-process integration
+* [ ] Define Forge fetching strategy for pre-compiled binaries (Hard Traits)
+* [ ] Extract and store traits locally in ~/.ethos/traits/  
+* [ ] Add update and remove commands for installed traits
 
-## **🔌 The Traits Ecosystem (Plugins)**
+## **🔌 The Traits Ecosystem (SDKs & Plugins)**
 
-* \[ \] Soft Traits (Python) full support  
-* \[ \] Hard Traits: C-ABI integration (ctypes)  
-* \[ \] Hard Traits: Rust (cdylib) integration  
-* \[ \] Hard Traits: Java (GraalVM native image) integration
+* [ ] Soft Traits: Python native package support
+* [ ] Core: Finalize the standard C-ABI loading protocol in Ethos (using ctypes)  
+* [ ] SDK: Build the standard Ethos Trait API Header for C/C++ developers  
+* [ ] SDK: Build the standard Ethos Trait API Crate for Rust developers (using cdylib)  
+* [ ] SDK: Build the standard Ethos Trait API bindings for Java (GraalVM native-image)
+
 
 ## **🖥️ Ethos IDE (Alpha)**
 
