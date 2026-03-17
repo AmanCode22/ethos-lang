@@ -29,15 +29,15 @@ Ethos is built to be intuitive. Here is a quick look at what coding in Ethos loo
 **Variables and Math:**
 
 ```
-set age to 20\.  
+set age to 20.  
 add 5 to age.  
 say age.
 ```
 
 **Loops and Conditions:**
 ```
-set counter to 0\.  
-repeat 5\.  
+set counter to 0.  
+repeat 5.  
     add 1 to counter.  
     say counter.  
 end.
@@ -45,7 +45,7 @@ end.
 **Using Functions and Packages:**
 ```
 bring in math.  
-run math.sqrt with 144\.
+run math.sqrt with 144.
 ```
 ## **🔌 The Traits Ecosystem (Plugins)**
 
@@ -69,24 +69,8 @@ Ethos is currently built on top of Python and compiled using Nuitka. This allows
 
 ## **🚀 Getting Started**
 
-**1\. Clone the repository:**
-``
-git clone \[https://github.com/AmanCode22/ethos-lang.git\](https://github.com/AmanCode22/ethos-lang.git)  
-cd ethos-lang
-```
-**2\. Run the Ethos REPL:**
+Instruction would be added as soon as the project reaches beta/stable stage.
 
-Launch the interactive console to start writing conversational code.
-```
-./ethos/main.bin
-```
-**3\. Use Forge:**
-
-Install new Traits directly from the command line.
-```
-./forge/main.bin install \<trait-name\>
-```
-## **Contributing & Documentation**
 
 * If you want to know how Ethos works under the hood? Read the [DOCUMENTATION.md](DOCUMENTATION.md).  
 * Want to contribute? Create a fork, make your changes, and open a Pull Request\!
