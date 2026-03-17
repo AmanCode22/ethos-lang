@@ -1,2 +1,3 @@
 nuitka
 pyreadline3; platform_system=="Windows"
+zstandard
