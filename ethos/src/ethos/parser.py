@@ -1,17 +1,37 @@
 def convert_operation(operation):
     mapping = {
-        "is": "==", "is not": "!=", "is above": ">", "is below": "<",
-        "is at least": ">=", "is at most": "<=", "and": "and", "not": "not",
-        "or": "or", "plus": "+", "minus": "-", "times": "*",
-        "divided by": "/", "to the power of": "**"
+        "is": "==",
+        "is not": "!=",
+        "is above": ">",
+        "is below": "<",
+        "is at least": ">=",
+        "is at most": "<=",
+        "and": "and",
+        "not": "not",
+        "or": "or",
+        "plus": "+",
+        "minus": "-",
+        "times": "*",
+        "divided by": "/",
+        "to the power of": "**",
     }
     return mapping.get(operation, operation)
 
+
 def preprocess_tokens(tokens_list):
     multi_words_mapper = [
-        "is not", "is above", "is below", "is at least", "is at most",
-        "divided by", "to the power of", "bring in", "how to", "otherwise if",
-        "run function", "delete variable"
+        "is not",
+        "is above",
+        "is below",
+        "is at least",
+        "is at most",
+        "divided by",
+        "to the power of",
+        "bring in",
+        "how to",
+        "otherwise if",
+        "run function",
+        "delete variable",
     ]
     i = 0
     processed = []
@@ -29,6 +49,7 @@ def preprocess_tokens(tokens_list):
             i += 1
     return processed
 
+
 def parse(all_tokens):
     final_code = ""
     indent_level = 0
@@ -39,9 +60,9 @@ def parse(all_tokens):
         tokens = preprocess_tokens(sentence)
         if not tokens:
             continue
-        
+
         first = tokens[0]
-        
+
         if first == "python":
             python_mode = True
             continue
@@ -64,8 +85,9 @@ def parse(all_tokens):
 
         if first == "otherwise":
             indent_level -= 1
-        
-        if indent_level < 0: indent_level = 0
+
+        if indent_level < 0:
+            indent_level = 0
         padding = " " * (indent_level * 4)
         line_content = ""
 
@@ -91,13 +113,27 @@ def parse(all_tokens):
             line_content = f"import {tokens[1]}\n"
         elif first == "run":
             if tokens[1] == "function":
-                args = ", ".join(tokens[4:]) if "with" in tokens else ""
+                args = (
+                    ", ".join([i.rstrip(",") for i in tokens[4:]])
+                    if "with" in tokens
+                    else ""
+                )
                 line_content = f"{tokens[2]}({args})\n"
             else:
-                args = ", ".join(tokens[3:]) if "with" in tokens else ""
+                args = (
+                    ", ".join([i.rstrip(",") for i in tokens[3:]])
+                    if "with" in tokens
+                    else ""
+                )
                 line_content = f"{tokens[1]}({args})\n"
         elif first == "how to":
-            args = ", ".join(tokens[tokens.index("with")+1:-1]) if "with" in tokens else ""
+            args = (
+                ", ".join(
+                    [i.rstrip(",") for i in tokens[tokens.index("with") + 1 : -1]]
+                )
+                if "with" in tokens
+                else ""
+            )
             line_content = f"def {tokens[1]}({args}):\n"
         elif first in ["if", "while"]:
             py_kw = "if" if first == "if" else "while"
@@ -116,7 +152,9 @@ def parse(all_tokens):
             start, end = tokens[2], tokens[4]
             step = tokens[6] if "stepping" in tokens else "1"
             offset = "- 1" if step.startswith("-") else "+ 1"
-            line_content = f"for {var} in range({start}, int({end}) {offset}, {step}):\n"
+            line_content = (
+                f"for {var} in range({start}, int({end}) {offset}, {step}):\n"
+            )
         elif first == "delete variable":
             line_content = f"del {tokens[1]}\n"
 
@@ -125,9 +163,9 @@ def parse(all_tokens):
                 final_code += f"{padding}print('DEBUG: {' '.join(tokens)}')\n"
             if python_mode:
                 final_code += f"{padding}print('PY_GEN: {line_content.strip()}')\n"
-            
+
             final_code += padding + line_content
-            
+
             if first in ["how to", "if", "while", "otherwise", "repeat", "count"]:
                 indent_level += 1
 
