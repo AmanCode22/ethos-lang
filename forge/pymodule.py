@@ -1,7 +1,5 @@
-# To impliment: handle_get, handle_wheel_get, handle_wheel_local, handle_sdist_get, handle_sdist_local
 import json
 import pathlib
-import platform
 import re
 import sysconfig
 import tarfile
