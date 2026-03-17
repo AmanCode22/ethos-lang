@@ -1,6 +1,6 @@
-# **📝 Ethos & Forge To-Do List**
+# **📝 Ethos & Forge Roadmap**
 
-Track the progress of the Ethos language, the Forge package manager, and the surrounding ecosystem here.
+Since this is a solo project in a heavy alpha state, this is where I'm tracking my personal progress for the Ethos language, the Forge package manager, and the surrounding ecosystem.
 
 ## **🧠 Core Language (Ethos)**
 
@@ -26,9 +26,9 @@ Track the progress of the Ethos language, the Forge package manager, and the sur
 * \[ \] Hard Traits: Rust (cdylib) integration  
 * \[ \] Hard Traits: Java (GraalVM native image) integration
 
-## **🖥️ Ethos IDE**
+## **🖥️ Ethos IDE (Alpha)**
 
-* \[ \] Initial Qt-based GUI design (Alpha Stage)  
+* \[ \] Initial Qt-based GUI design  
 * \[ \] Integrate built-in Runner  
 * \[ \] Integrate built-in Compiler  
 * \[ \] Implement syntax highlighting specifically for Ethos syntax  
