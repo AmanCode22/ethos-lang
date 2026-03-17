@@ -1,4 +1,4 @@
-# **Currently not usable and in heavily alpha stage** #
+# **Currently not usable as in heavily alpha stage** #
 # **Ethos & Forge 🌌**
 
 **Ethos** is a cross-platform, natural-syntax programming language that translates conversational English into executable Python logic.
