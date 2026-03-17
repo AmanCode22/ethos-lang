@@ -6,7 +6,11 @@ Welcome to the documentation for Ethos\! I wrote this document to help students,
 
 ## **🎯 The Philosophy**
 
+<<<<<<< HEAD
 Programming can be incredibly intimidating. I created Ethos with one primary goal in mind: **to build the easiest, most accessible programming language in the world.** By replacing rigid symbols ({}, (), ;) with natural English sentences ending in periods, I wanted to remove the friction of learning syntax so you can focus purely on learning **logic**.
+=======
+Programming can be intimidating. Ethos is made with one primary goal: **to create the easiest, most accessible programming language in the world.** By replacing rigid symbols ({}, (), ;) with natural English sentences ending in periods, Ethos removes the friction of learning syntax so students can focus purely on learning **logic**. Because it runs perfectly on Windows, macOS, Linux, and **Android via Termux**, you can learn to code absolutely anywhere.
+>>>>>>> origin/main
 
 ## **🏗️ How It Works (Under the Hood)**
 
