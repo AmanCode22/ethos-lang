@@ -21,8 +21,8 @@ Since this is a solo project in a heavy alpha state, this is where I'm tracking 
 
 ## **🔌 The Traits Ecosystem (SDKs & Plugins)**
 
-* [ ] Soft Traits: Python native package support
-* [ ] Core: Finalize the standard C-ABI loading protocol in Ethos (using ctypes)  
+* [x] Soft Traits: Python native package support
+* [x] Core: Finalize the standard C-ABI loading protocol in Ethos (using ctypes)  
 * [ ] SDK: Build the standard Ethos Trait API Header for C/C++ developers  
 * [ ] SDK: Build the standard Ethos Trait API Crate for Rust developers (using cdylib)  
 * [ ] SDK: Build the standard Ethos Trait API bindings for Java (GraalVM native-image)
