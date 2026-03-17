@@ -9,7 +9,7 @@ Since this is a solo project in a heavy alpha state, this is where I'm tracking 
 * \[x\] Executer (isolated memory dictionary implementation)  
 * \[x\] Persistent state tracking across REPL lines  
 * \[x\] Multi-OS compatibility (Windows, macOS, Linux)  
-* \[ \] Implement support for multi-line up/down arrow history in REPL (readline) 
+* \[x\] Implement support for multi-line up/down arrow history in REPL (readline) 
 * \[x\] Fix multiple arguments failing in functions (comma parsing bug)
 
 ## **📦 Package Manager (Forge)**
