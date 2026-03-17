@@ -29,3 +29,4 @@ venv/
 
 
 binary/
+nuitka-crash-report.xml
