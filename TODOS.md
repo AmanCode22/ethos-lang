@@ -15,7 +15,7 @@ Since this is a solo project in a heavy alpha state, this is where I'm tracking 
 
 * [x] Zero-dependency CLI structure  
 * [x] Support installing Python "Soft Traits" via custom pip sdist/bdist installation setup
-* [ ] Define Forge fetching strategy for pre-compiled binaries (Hard Traits)
+* [x] Define Forge fetching strategy for pre-compiled binaries (Hard Traits)
 * [ ] Extract and store traits locally in ~/.ethos/traits/  
 * [ ] Add update and remove commands for installed traits
 
