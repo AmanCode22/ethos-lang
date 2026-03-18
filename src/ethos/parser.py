@@ -104,11 +104,11 @@ def parse(all_tokens):
             if "from" in tokens and "to" in tokens:
                 line_content = f"{tokens[1]} = {tokens[1]}[{tokens[3]}:{tokens[5]}]\n"
             else:
-                line_content = f"{tokens[1]} = {convert_operation(tokens[3])}\n"
+                line_content = f"{tokens[1]} =  {' '.join([convert_operation(t) for t in tokens[3:]])}\n"
         elif first == "add":
-            line_content = f"{tokens[3]} += {convert_operation(tokens[1])}\n"
+            line_content = f"{tokens[-1]} += {' '.join([convert_operation(t) for t in tokens[1 : tokens.index('to')]])}\n"
         elif first == "subtract":
-            line_content = f"{tokens[3]} -= {convert_operation(tokens[1])}\n"
+            line_content = f"{tokens[-1]} -= {' '.join([convert_operation(t) for t in tokens[1 : tokens.index('from')]])}\n"
         elif first == "bring in":
             line_content = f"import {tokens[1]}\n"
         elif first == "run":
