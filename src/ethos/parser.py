@@ -157,7 +157,18 @@ def parse(all_tokens):
             )
         elif first == "delete variable":
             line_content = f"del {tokens[1]}\n"
-
+        elif first == "ask":
+            if not len(tokens) == 4:
+                print(
+                    "Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name"
+                )
+                return
+            if tokens[2] != "into":
+                print(
+                    "Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name"
+                )
+                return
+            line_content = f"{tokens[3]} = input({tokens[1]})\n"
         if line_content:
             if debug_mode:
                 final_code += f"{padding}print('DEBUG: {' '.join(tokens)}')\n"
