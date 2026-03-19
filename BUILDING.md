@@ -28,7 +28,7 @@ mkdir binary/
 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile -o binary/ethos main.py
 ```
 After this completes you would have a compiled binary of ethos in binary folder.
-Use it  ```./binary/ethos```
+Use it  by typing ```./binary/ethos``` in terminal
 ## Building on Windows
 Would be added soon
 ## Building on Macos
