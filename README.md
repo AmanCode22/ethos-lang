@@ -275,7 +275,7 @@ ethos-lang/
 ```
 
 ---
-
+For instructions on building yourself refer to [BUILDING.md](BUILDING.md) and the full documentation can be accesed at [DOCS.md](DOCS.md).
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
