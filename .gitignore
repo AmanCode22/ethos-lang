@@ -1,4 +1,6 @@
 binary/
 nuitka-crash-log.xml
-main.bin*
+main.build
+main.dist
+main.onefile-build
 __pycache__
