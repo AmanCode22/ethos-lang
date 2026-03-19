@@ -1,3 +1,4 @@
 binary/
 nuitka-crash-log.xml
 main.bin*
+__pycache__
