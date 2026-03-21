@@ -3,7 +3,9 @@ import shlex
 
 
 def split_sentences(raw_text):
-    sentences = re.findall(r'((?:"(?:[^"\\]|\\.)*"|[^.])+\.)', raw_text)
+    sentences = re.findall(
+        r"""((?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\d+\.\d+|[^.])+\.)""", raw_text
+    )
     final_sentences = []
     for i in sentences:
         trimmed = i.strip()
