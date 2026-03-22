@@ -1,8 +1,8 @@
-# Ethos — Language Syntax & Hard Trait Reference
+# Ethos — Language Reference
 
-**v0.1.0-alpha** · by [Aman Adlakha](https://github.com/amancode22)
 
-> The Hard Trait SDK (C/C++ and Rust) is under development and will be released separately. This document covers the language syntax and the runtime format the Ethos executor uses to load Hard Traits.
+
+> The Hard Trait SDK for C/C++ and Rust is under development and will ship separately. This document covers the full language syntax, how the lexer and parser work internally, and the runtime format for both Soft and Hard Traits.
 
 ---
 
@@ -22,10 +22,10 @@
 
 Ethos programs are `.ethos` files. The rules:
 
-- Every statement is a sentence ending with a **period**.
-- Keywords are case-insensitive. String contents are not.
+- Every statement is a sentence ending with a period.
+- Keywords are case-insensitive. `SET`, `Say`, `REPEAT`, `HOW TO` all work. String contents are never modified — only bare words outside quotes get lowercased.
 - Strings go in `"double"` or `'single'` quotes.
-- Indentation doesn't matter — the parser tracks block depth itself. Indent anyway for readability.
+- Indentation is completely ignored. The parser tracks block depth itself through block-opening keywords and `end.` statements. Extra or missing spaces don't affect parsing.
 - Blank lines are ignored.
 
 ---
@@ -34,11 +34,11 @@ Ethos programs are `.ethos` files. The rules:
 
 Two passes happen before anything runs.
 
-**Pass 1 — split into sentences.** The source is cut on every `.` that isn't inside a quoted string. Each chunk becomes one statement.
+**Pass 1 — split into sentences.** The source text is cut at every `.` that isn't inside a quoted string. Decimal numbers like `3.14` are protected by the regex pattern. Each chunk becomes one statement. Blank chunks are dropped.
 
-**Pass 2 — tokenize.** Each sentence is split into words using POSIX-style shell splitting (so quoted strings stay intact). Everything outside quotes is lowercased. The trailing `.` is stripped from the last token.
+**Pass 2 — tokenize.** Each sentence is split into words using POSIX-style shell splitting via `shlex.split`, which keeps quoted strings intact. Every token that isn't a quoted string is lowercased. The trailing `.` is stripped from the last token.
 
-Then a pre-processing step merges these multi-word phrases into single tokens:
+A pre-processing step then merges multi-word phrases into single tokens before the parser sees them:
 
 ```
 is not          is above        is below
@@ -47,11 +47,13 @@ to the power of bring in        how to
 otherwise if    run function    delete variable
 ```
 
+The merger tries lengths 4, 3, and 2 in that order — so `to the power of` (length 4) takes priority over any shorter overlap.
+
 ---
 
 ## 3. Statements
 
-### `say` — print something
+### `say` — print
 
 ```
 say <value>.
@@ -63,7 +65,7 @@ say score.
 say 42.
 ```
 
-→ `print(<value>)`
+Transpiles to `print(<value>)`.
 
 ---
 
@@ -81,7 +83,7 @@ set name to "Aman".
 set total to x times 3 plus 1.
 ```
 
-**String slicing:**
+String slicing — detected when both `from` and `to` appear in the token list:
 
 ```
 set <var> to <source> from <start> to <end>.
@@ -91,7 +93,7 @@ set <var> to <source> from <start> to <end>.
 set piece to name from 0 to 3.
 ```
 
-→ `piece = name[0:3]`
+Transpiles to `piece = name[0:3]`.
 
 ---
 
@@ -107,7 +109,7 @@ add 1 to counter.
 subtract 5 from health.
 ```
 
-→ `counter += 1` / `health -= 5`
+Transpiles to `counter += 1` and `health -= 5`.
 
 ---
 
@@ -117,23 +119,23 @@ subtract 5 from health.
 delete variable <name>.
 ```
 
-→ `del name`
+Transpiles to `del name`.
 
 ---
 
-### `ask` — read user input
+### `ask` — read input
 
 ```
 ask <"prompt"> into <var>.
 ```
 
-Must be exactly four tokens. `into` is required.
+Must be exactly four tokens. `into` is required in position 3.
 
 ```
 ask "Your name: " into username.
 ```
 
-→ `username = input("Your name: ")`
+Transpiles to `username = input("Your name: ")`.
 
 ---
 
@@ -149,19 +151,7 @@ otherwise.
 end.
 ```
 
-One `end.` closes the whole chain. `otherwise if` → `elif`, `otherwise` alone → `else`.
-
-```
-if score is above 90.
-    say "A".
-otherwise if score is at least 75.
-    say "B".
-otherwise.
-    say "C".
-end.
-```
-
-Conditions can chain with `and`, `or`, `not`:
+One `end.` closes the whole chain. `otherwise if` becomes `elif`, bare `otherwise` becomes `else`. Conditions can chain with `and`, `or`, and `not`:
 
 ```
 if age is at least 18 and verified is 1.
@@ -179,9 +169,7 @@ repeat <n>.
 end.
 ```
 
-Loop variable is anonymous (`_`).
-
-→ `for _ in range(n):`
+Loop variable is anonymous (`_`). Transpiles to `for _ in range(n):`.
 
 ---
 
@@ -211,8 +199,7 @@ count from 10 to 0 variable i stepping -2.
 end.
 ```
 
-→ `for i in range(start, int(end) + 1, step):`  
-(End offset flips: `+1` going forward, `-1` going backward.)
+The parser detects direction from the step sign and adjusts the range end by `+1` for forward loops and `-1` for backward loops.
 
 ---
 
@@ -234,7 +221,7 @@ end.
 
 ### `how to` / `run` — functions
 
-**Define:**
+Define:
 
 ```
 how to <name>.
@@ -246,7 +233,7 @@ how to <name> with <param1>, <param2>.
 end.
 ```
 
-**Call:**
+Call:
 
 ```
 run <name>.
@@ -254,7 +241,7 @@ run <name> with <arg1>, <arg2>.
 run function <name> with <arg1>.
 ```
 
-`run` and `run function` do the same thing.
+`run` and `run function` are identical — both exist so code reads naturally either way.
 
 ```
 how to greet with name.
@@ -272,7 +259,7 @@ run greet with "Aman".
 bring in <module>.
 ```
 
-→ `import <module>`
+Transpiles to `import <module>`.
 
 ---
 
@@ -287,7 +274,7 @@ spanning lines.
 endnotes.
 ```
 
-→ `# ...` and `''' ... '''`
+Single-line notes transpile to `# ...`. Block notes use `''' ... '''`.
 
 ---
 
@@ -307,7 +294,7 @@ Output: `PY_GEN: x =  5 + 3`
 
 ### `debug` / `debugend` — trace tokens
 
-Prints the token list for each statement before it executes.
+Prints the full token list for each statement before it executes.
 
 ```
 debug.
@@ -354,9 +341,7 @@ Output: `DEBUG: set x to 10`
 
 ## 5. Hard Trait runtime format
 
-The Hard Trait SDK (C/C++ and Rust) is under development. This section documents what the Ethos runtime currently expects from an installed Hard Trait — enough to understand how loading works, not enough to write one from scratch yet.
-
-Community SDK contributions for languages other than C/C++ and Rust are welcome via PR.
+The Hard Trait SDK is still in development. This section documents what the Ethos runtime expects from an installed Hard Trait — enough to understand loading, not enough to write one from scratch yet. Community SDK contributions for languages other than C/C++ and Rust are welcome via PR.
 
 ### Directory layout
 
@@ -367,8 +352,6 @@ Community SDK contributions for languages other than C/C++ and Rust are welcome 
 ```
 
 The folder name must match the `name` field in `manifest.json`.
-
----
 
 ### manifest.json
 
@@ -391,13 +374,11 @@ The folder name must match the `name` field in `manifest.json`.
 
 | Field | Required | Description |
 |---|---|---|
-| `name` | ✅ | Trait name. Must match the directory name. |
-| `binary` | ✅ | Shared library filename, relative to the trait folder. |
-| `functions` | ✅ | Map of exported function names to their signatures. |
-| `functions.<n>.return` | ✅ | Return type string. Use `"void"` for no return value. |
-| `functions.<n>.args` | ✅ | List of argument type strings. Use `[]` for none. |
-
----
+| `name` | yes | Trait name. Must match the directory name. |
+| `binary` | yes | Shared library filename, relative to the trait folder. |
+| `functions` | yes | Map of exported function names to their signatures. |
+| `functions.<n>.return` | yes | Return type string. Use `"void"` for no return. |
+| `functions.<n>.args` | yes | List of argument type strings. Use `[]` for none. |
 
 ### Supported types
 
@@ -430,36 +411,32 @@ The folder name must match the `name` field in `manifest.json`.
 | `"bool"`                 | `bool`               |
 | `"void"`                 | (no return value)    |
 
-An unrecognized type skips that one function with a warning. The rest of the trait loads fine.
-
----
+An unrecognized type skips that one function with a warning. The rest of the trait still loads.
 
 ### SDK language support
 
-| Language | Status |
+| Language     | Status |
 |---|---|
-| C / C++ | Official SDK — under development |
-| Rust | Official SDK — under development |
+| C / C++      | Official SDK — under development |
+| Rust         | Official SDK — under development |
 | Everything else | Community PRs welcome |
-
----
 
 ### How loading works
 
 On startup, Ethos scans `~/.ethos/traits/hard_traits/` and for each subfolder:
 
-1. Looks for `manifest.json` — missing → warning, skip.
-2. Parses it as JSON — invalid → warning, skip.
-3. Checks the binary file exists — missing → warning, skip.
+1. Looks for `manifest.json`. Missing → warning, skip.
+2. Parses it as JSON. Invalid → warning, skip.
+3. Checks the binary file exists. Missing → warning, skip.
 4. Loads it with `ctypes.CDLL`.
-5. Wires up `restype` and `argtypes` for each function in `"functions"`. Bad type → warning for that function only, rest still loads.
-6. Puts the library object in the execution environment under the trait's `name`. Your Ethos program can then call its functions.
+5. For each function in `"functions"`, sets `restype` and `argtypes`. Bad type string → warning for that function only, rest of trait still loads.
+6. Puts the library object into the execution environment under the trait's `name`. Ethos programs can then call its functions directly.
 
 ---
 
 ## 6. Soft Trait runtime
 
-Soft Traits are Python packages sitting in `~/.ethos/traits/`. At startup, that folder is prepended to `sys.path`. That's it — `bring in` just works.
+Soft Traits are Python packages sitting in `~/.ethos/traits/`. Ethos prepends that path to `sys.path` at startup, so `bring in` works exactly like a normal import.
 
 Forge never runs install scripts. It only extracts the wheel or sdist archive. For a package to be importable, its top-level module folder must land directly inside `~/.ethos/traits/` after extraction.
 
@@ -473,33 +450,31 @@ Forge never runs install scripts. It only extracts the wheel or sdist archive. F
 |---|---|
 | `Error: 'end' found without a matching block` | `end.` with no matching `if`, `while`, `repeat`, `count`, or `how to`. |
 | `Error: 'say' needs a value` | `say` used with nothing after it. |
-| `Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name` | `ask` missing `into`, or wrong number of tokens. |
+| `Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name` | `ask` missing `into`, or wrong token count. |
 
 ### Runtime
 
 | Message | What happened |
 |---|---|
-| `Ethos Runtime Error: <msg>` | Exception raised during `exec()`. Python error shown. |
+| `Ethos Runtime Error: <msg>` | Exception during `exec()`. The Python error is shown. |
 
 ### Hard Trait loading
 
 | Message | What happened |
 |---|---|
-| `Warning: Trait <n> does not have a manifest.json file...` | No manifest found in the trait folder. |
+| `Warning: Trait <n> does not have a manifest.json file...` | No manifest in the trait folder. |
 | `Warning: Trait <n> manifest.json file is invalid...` | Manifest isn't valid JSON. |
-| `Warning: Trait <n> binary path defined in manifest.json is invalid...` | The `.so` file listed in `"binary"` doesn't exist. |
+| `Warning: Trait <n> binary path defined in manifest.json is invalid...` | The `.so` listed in `"binary"` doesn't exist. |
 | `Warning: In trait <n> there is a function named <fn> of which types are not correctly written...` | Type string not in the supported types table. |
 
-### Forge
+### Forge errors (when used with Ethos)
 
 | Message | What happened |
 |---|---|
-| `[-] This package does not exist or its a network error/pypi might be blocked` | PyPI lookup failed or package doesn't exist. |
+| `[-] This package does not exist or its a network error/pypi might be blocked` | PyPI lookup failed or the package name is wrong. |
 | `[-] Cannot get results from pypi...` | PyPI response couldn't be decoded. |
-| `[-] This package doesnt support your system and its tar sdist isnt published` | No compatible wheel or sdist for this platform. |
-| `[-] Invalid Hard Trait: No manifest.json found` | Zip passed to Forge has no manifest. |
-| `[-] Trait cannot be installed due to invalid manifest.json.` | Manifest missing `name` or `binary`. |
-| `[-] Failed to remove. Soft trait <n> is not installed.` | Package not found in `~/.ethos/traits/`. |
-| `[-] Failed to remove. Hard trait <n> is not installed.` | Trait not found in `~/.ethos/traits/hard_traits/`. |
-
----
+| `[-] This package doesnt support your system and its tar sdist isnt published` | No compatible wheel or sdist for your platform. |
+| `[-] Invalid Hard Trait: No manifest.json found` | Zip has no `manifest.json` at any depth. |
+| `[-] Trait cannot be installed due to invalid manifest.json.` | Manifest is missing `name` or `binary`. |
+| `[-] Failed to remove. Soft trait <n> is not installed.` | Package not in `~/.ethos/traits/`. |
+| `[-] Failed to remove. Hard trait <n> is not installed.` | Trait not in `~/.ethos/traits/hard_traits/`. |
