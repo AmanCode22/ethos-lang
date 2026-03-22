@@ -271,6 +271,13 @@ Open the REPL:
 ethos
 ```
 
+Check the installed version:
+
+```bash
+ethos --version
+ethos -v
+```
+
 The REPL tracks open blocks. When you start an `if`, `while`, `repeat`, `count`, or `how to`, the prompt switches to `...` and buffers your input until you close with `end.`, then the whole block executes at once. Session history is saved to `~/.ethos/.ethos_history`.
 
 Type `exit` or `quit` to leave.
@@ -293,11 +300,12 @@ Both kinds are managed by **Forge** → [github.com/amancode22/forge](https://gi
 - macOS `.pkg` installer
 - Android via Termux
 - Hard Trait SDK for C/C++ and Rust
+- Eventually: rewrite the core in C, C++, or Rust
+
+## Expected Features(Not planned for now)
 - Language Server Protocol (LSP)
 - VSCode and Zed extensions
 - Ethos Studio — a GUI IDE
-- Eventually: rewrite the core in C, C++, or Rust
-
 ---
 
 ## Contributing
