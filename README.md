@@ -1,17 +1,14 @@
-
 # Ethos
+
+![Ethos Logo](ethos_logo.png)
 
 **A language that speaks for itself — literally.**
 
-*Write code the way you'd explain it to someone.*
+Ethos is a programming language with an English-based syntax. Every statement is a sentence. Every sentence ends with a period. No brackets, no semicolons, no cryptic symbols.
 
----
+It transpiles to Python, so it's fast to get running and easy to extend. Native extensions are called **Hard Traits** — compiled C/C++/Rust binaries loaded via ctypes at startup. Python package extensions are called **Soft Traits**. Both are managed by **Forge**, the companion package manager.
 
-Ethos is a programming language with an English-based syntax. Every statement is a sentence. Every sentence ends with a period. No brackets, no semicolons, no cryptic symbols — just words.
-
-It transpiles to Python under the hood, so it's fast to get running and easy to extend. Native extensions are called **Hard Traits** (compiled C/C++/Rust binaries). Python package extensions are called **Soft Traits**. Both are managed by **Forge**, Ethos's companion package manager.
-
-> Built by [Aman Adlakha](https://github.com/amancode22) — a Class 9 student from India, doing this solo.
+I built this myself as a solo side project. I'm a Class 9 student from India and I wrote every line of this.
 
 ---
 
@@ -35,43 +32,57 @@ otherwise.
 end.
 ```
 
-That's it. That's the language.
-
 ---
 
 ## Getting started
 
+### Windows
+
+A combined installer for both **Ethos and Forge** lives in the [ethos-lang releases](https://github.com/amancode22/ethos-lang/releases). That's the easiest way to get both tools at once. There's also a standalone compiled `.exe` for Ethos only in the same releases page if that's all you need.
+
 ### Linux (pre-built binary)
 
-Grab the latest binary from the [Releases](https://github.com/amancode22/ethos-lang/releases) page:
+Grab the binary from [Releases](https://github.com/amancode22/ethos-lang/releases):
 
 ```bash
 chmod +x ethos
 sudo mv ethos /usr/local/bin/
 ```
 
-> Windows, macOS, Android (Termux), and native Linux packages (`.deb`, `.rpm`, AUR) are on the roadmap.
+Linux package builds are coming soon — `.tar.gz` with a compiler and `install.sh`, COPR, PPA, and AUR (both PKGBUILD and a pre-compiled binary package).
 
 ### From source
 
-You'll need Python 3.10 or newer.
+Python 3.10 or newer.
 
 ```bash
 git clone https://github.com/amancode22/ethos-lang.git
 cd ethos-lang
 pip install -r requirements.txt
 
-python main.py                 # opens the REPL
-python main.py hello.ethos     # runs a file
+python main.py              # opens the REPL
+python main.py hello.ethos  # runs a file
 ```
 
 ---
 
 ## The language
 
-Every Ethos statement is a sentence ending with a `.` — that's the only rule you need to remember upfront.
+### Sentences and periods
 
-### Variables
+Every statement ends with `.`. That's the only punctuation rule. The lexer splits on `.` that aren't inside quoted strings, so decimal numbers like `3.14` work fine inside expressions.
+
+### Case insensitivity
+
+All keywords are case-insensitive. `SET`, `Say`, `REPEAT`, `If`, `HOW TO` all work. String contents are never touched — only bare words outside quotes get lowercased.
+
+### Indentation and spaces
+
+Indentation is completely ignored. The parser tracks block depth itself through block-opening keywords and `end.` statements — extra or missing spaces don't affect parsing at all. Indent for readability, not correctness.
+
+---
+
+## Variables
 
 ```
 set x to 10.
@@ -79,7 +90,28 @@ set name to "Aman".
 set result to x times 3 plus 1.
 ```
 
-### Arithmetic
+String slicing:
+
+```
+set piece to name from 0 to 3.
+```
+
+In-place operations:
+
+```
+add 5 to score.
+subtract 1 from lives.
+```
+
+Delete a variable:
+
+```
+delete variable temp.
+```
+
+---
+
+## Arithmetic
 
 | Write this        | Means |
 |-------------------|-------|
@@ -89,33 +121,23 @@ set result to x times 3 plus 1.
 | `divided by`      | `/`   |
 | `to the power of` | `**`  |
 
-### In-place operations
+---
 
-```
-add 5 to score.
-subtract 1 from lives.
-```
-
-### String slicing
-
-```
-set piece to name from 0 to 3.
-```
-
-### Output
+## Output and input
 
 ```
 say "Hello.".
 say result.
-```
+say 42.
 
-### Input
-
-```
 ask "Enter something: " into response.
 ```
 
-### Conditionals
+`ask` takes exactly four tokens: `ask`, the prompt string, `into`, and the variable name.
+
+---
+
+## Conditionals
 
 ```
 if score is above 90.
@@ -127,30 +149,55 @@ otherwise.
 end.
 ```
 
-Comparisons: `is`, `is not`, `is above`, `is below`, `is at least`, `is at most`  
-Logical: `and`, `or`, `not`
+One `end.` closes the whole chain. Logical operators work inside conditions:
 
-### Loops
+```
+if age is at least 18 and verified is 1.
+    say "Access granted.".
+end.
+```
+
+Comparisons: `is`, `is not`, `is above`, `is below`, `is at least`, `is at most`
+
+---
+
+## Loops
+
+Repeat N times:
 
 ```
 repeat 5.
     say "again".
 end.
+```
 
+Counted range:
+
+```
 count from 1 to 10 variable i.
     say i.
 end.
+```
 
+With a custom step:
+
+```
 count from 10 to 0 variable i stepping -1.
     say i.
 end.
+```
 
+While loop:
+
+```
 while lives is above 0.
     subtract 1 from lives.
 end.
 ```
 
-### Functions
+---
+
+## Functions
 
 ```
 how to greet with name.
@@ -161,13 +208,19 @@ end.
 run greet with "Aman".
 ```
 
-### Imports
+`run` and `run function` do exactly the same thing. Multiple parameters are comma-separated after `with`.
+
+---
+
+## Imports
 
 ```
 bring in math.
 ```
 
-### Comments
+---
+
+## Comments
 
 ```
 note this is a single line comment.
@@ -178,13 +231,11 @@ multiple lines.
 endnotes.
 ```
 
-### Delete a variable
+---
 
-```
-delete variable temp.
-```
+## Debugging tools
 
-### Inspect the generated Python
+Inspect the generated Python without running it:
 
 ```
 python.
@@ -192,9 +243,9 @@ set x to 5 plus 3.
 pythonend.
 ```
 
-Prints `PY_GEN: x =  5 + 3` instead of running it. Handy for debugging the transpiler.
+Prints `PY_GEN: x =  5 + 3`.
 
-### Debug mode
+Trace tokens before each statement executes:
 
 ```
 debug.
@@ -202,62 +253,58 @@ set x to 10.
 debugend.
 ```
 
-Prints the token list for each statement before executing it.
+Prints `DEBUG: set x to 10`.
 
 ---
 
 ## Running Ethos
 
-**Run a file:**
+Run a file:
+
 ```bash
 ethos myprogram.ethos
 ```
 
-Files need the `.ethos` extension.
+Open the REPL:
 
-**Open the REPL:**
 ```bash
 ethos
 ```
 
-Type sentences, press Enter. Multi-line blocks buffer automatically until you type `end.` Type `exit` or `quit` to leave. Your history is saved to `~/.ethos/.ethos_history`.
+The REPL tracks open blocks. When you start an `if`, `while`, `repeat`, `count`, or `how to`, the prompt switches to `...` and buffers your input until you close with `end.`, then the whole block executes at once. Session history is saved to `~/.ethos/.ethos_history`.
+
+Type `exit` or `quit` to leave.
 
 ---
 
 ## Traits
 
-Ethos can be extended with **Traits** — external packages that plug into your programs.
+**Soft Traits** are Python packages. Forge installs them into `~/.ethos/traits/`, which Ethos prepends to `sys.path` at startup. Use them with `bring in`.
 
-- **Soft Traits** are Python packages. Install with Forge, use with `bring in`.
-- **Hard Traits** are compiled native binaries (C, C++, Rust). They load automatically at startup via ctypes. The Hard Trait SDK is under development.
+**Hard Traits** are compiled shared libraries. At startup, Ethos scans `~/.ethos/traits/hard_traits/`, reads each trait's `manifest.json`, loads the `.so` with `ctypes.CDLL`, and wires up every exported function's signature from the manifest. The library is then available in your program's execution environment under the trait name.
 
-Traits are managed by **Forge** → [github.com/amancode22/forge](https://github.com/amancode22/forge)
+Both kinds are managed by **Forge** → [github.com/amancode22/forge](https://github.com/amancode22/forge)
 
 ---
 
 ## What's next
 
-- [ ] Windows `.msi` installer
-- [ ] macOS `.pkg` installer
-- [ ] Linux: `.deb`, `.rpm`, AUR
-- [ ] Android via Termux
-- [ ] Hard Trait SDK for C/C++ and Rust
-- [ ] Language Server Protocol (LSP)
-- [ ] VSCode and Zed extensions
-- [ ] Ethos Studio — a GUI IDE
-- [ ] Eventually: rewrite the core in C, C++, or Rust
+- Linux `.tar.gz` (compiler + install.sh), COPR, PPA, and AUR with pre-compiled package
+- macOS `.pkg` installer
+- Android via Termux
+- Hard Trait SDK for C/C++ and Rust
+- Language Server Protocol (LSP)
+- VSCode and Zed extensions
+- Ethos Studio — a GUI IDE
+- Eventually: rewrite the core in C, C++, or Rust
 
 ---
 
 ## Contributing
 
-This is a solo project, but outside contributions are welcome — especially:
+Solo project, but contributions are welcome — especially Hard Trait SDK bindings for languages other than C/C++ and Rust, which I'm handling myself. If you want to write SDK support for Go, Java, Zig, or anything else, open a PR. Bug reports and fixes always appreciated.
 
-- **Hard Trait SDK bindings** for languages other than C/C++ and Rust (those I'm handling myself). If you want to write SDK support for Java, Go, Zig, or anything else, open a PR.
-- Bug reports and fixes.
-- Anything that feels broken or missing.
-
-Open an issue before working on anything big so we don't duplicate effort.
+Open an issue before starting anything large so we don't duplicate effort.
 
 ---
 
@@ -268,16 +315,14 @@ ethos-lang/
 ├── main.py
 ├── requirements.txt
 └── src/ethos/
-    ├── cli.py        — REPL + file runner
-    ├── lexer.py      — sentence splitter + tokenizer
-    ├── parser.py     — transpiler
-    └── executer.py   — runner + Hard Trait loader
+    ├── cli.py        — REPL and file runner
+    ├── lexer.py      — sentence splitter and tokenizer
+    ├── parser.py     — transpiler to Python
+    └── executer.py   — runner and Hard Trait loader
 ```
 
----
-For instructions on building yourself refer to [BUILDING.md](BUILDING.md) and the full documentation can be accesed at [DOCS.md](DOCS.md).
+Build instructions: [BUILDING.md](BUILDING.md). Full language reference: [DOCS.md](DOCS.md).
+
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
-
----
