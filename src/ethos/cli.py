@@ -6,6 +6,7 @@ from sys import exit
 from .executer import create_enviroment, run
 from .lexer import lex
 from .parser import parse
+from .version import stage, version
 
 try:
     import readline
@@ -21,6 +22,9 @@ def main():
         print("Usage: ethosrun <filename.ethos>")
         exit()
     filename = sys.argv[1]
+    if filename == "--version" or filename == "-v":
+        print(f"Ethos {version} {stage}")
+        exit(0)
     if not filename.endswith(".ethos"):
         print("Filename must have extension .ethos")
         exit()
