@@ -30,7 +30,13 @@ mkdir binary/
 After this completes you would have a compiled binary of ethos in binary folder.
 Use it  by typing ```./binary/ethos``` in terminal
 ## Building on Windows
-Would be added soon
+Open powershell and change directory to where you downloaded source
+```
+pip install --upgrade pip
+pip install -r requirements.txt
+python -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=ethos.exe
+```
+You can use ethos.exe now!
 ## Building on Macos
 Would be added soon.
 ## Building on Android(Termux)
