@@ -265,6 +265,8 @@ The REPL tracks open blocks — when you start an `if`, `while`, `repeat`, `coun
 
 Both kinds are managed by Forge → [github.com/AmanCode22/forge](https://github.com/AmanCode22/forge)
 
+The compiled binary bundles a set of standard library modules so Soft Traits can use them at runtime without needing a system Python install. See [STDLIB_SHIMS.md](STDLIB_SHIMS.md) for the full list.
+
 ---
 
 ## What's next
@@ -299,7 +301,8 @@ ethos-lang/
 
 Build instructions: [BUILDING.md](BUILDING.md)  
 Full language reference: [DOCS.md](DOCS.md)  
-Linux installation: [LINUX_INSTALL.md](LINUX_INSTALL.md)
+Linux installation: [LINUX_INSTALL.md](LINUX_INSTALL.md)  
+Bundled stdlib modules: [STDLIB_SHIMS.md](STDLIB_SHIMS.md)
 
 ---
 
