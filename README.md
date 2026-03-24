@@ -4,9 +4,9 @@
 
 **A language that speaks for itself — literally.**
 
-Ethos is a programming language with an English-based syntax. Every statement is a sentence. Every sentence ends with a period. No brackets, no semicolons, no cryptic symbols.
+Ethos is a programming language with English-based syntax. Every statement is a sentence. Every sentence ends with a period. No brackets, no semicolons, no cryptic symbols. It transpiles to Python, so it's quick to get running and easy to extend.
 
-It transpiles to Python, so it's fast to get running and easy to extend. Native extensions are called **Hard Traits** — compiled C/C++/Rust binaries loaded via ctypes at startup. Python package extensions are called **Soft Traits**. Both are managed by **Forge**, the companion package manager.
+Extensions come in two kinds — **Soft Traits** (Python packages) and **Hard Traits** (compiled C/C++/Rust binaries loaded via ctypes). Both are managed by **Forge**, the companion package manager.
 
 I built this myself as a solo side project. I'm a Class 9 student from India and I wrote every line of this.
 
@@ -38,25 +38,20 @@ end.
 
 ### Windows
 
-A combined installer for both **Ethos and Forge** lives in the [ethos-lang releases](https://github.com/amancode22/ethos-lang/releases). That's the easiest way to get both tools at once. There's also a standalone compiled `.exe` for Ethos only in the same releases page if that's all you need.
+A combined installer for both **Ethos and Forge** is on the [releases page](https://github.com/AmanCode22/ethos-lang/releases). That's the easiest way to get both tools at once. There's also a standalone compiled `.exe` for Ethos only on the same page if that's all you need. The installer sets up PATH and registers the `.ethos` file extension automatically.
 
-### Linux (pre-built binary)
+### Linux
 
-Grab the binary from [Releases](https://github.com/amancode22/ethos-lang/releases):
+See [LINUX_INSTALL.md](LINUX_INSTALL.md) for all options — OBS repos, AUR, and the universal tarball.
 
-```bash
-chmod +x ethos
-sudo mv ethos /usr/local/bin/
-```
-
-Linux package builds are coming soon — `.tar.gz` with a compiler and `install.sh`, COPR, PPA, and AUR (both PKGBUILD and a pre-compiled binary package).
+The pre-built binary on the [releases page](https://github.com/AmanCode22/ethos-lang/releases) is a standalone compiled executable. No Python needed.
 
 ### From source
 
 Python 3.10 or newer.
 
 ```bash
-git clone https://github.com/amancode22/ethos-lang.git
+git clone https://github.com/AmanCode22/ethos-lang.git
 cd ethos-lang
 pip install -r requirements.txt
 
@@ -70,15 +65,15 @@ python main.py hello.ethos  # runs a file
 
 ### Sentences and periods
 
-Every statement ends with `.`. That's the only punctuation rule. The lexer splits on `.` that aren't inside quoted strings, so decimal numbers like `3.14` work fine inside expressions.
+Every statement ends with `.`. The lexer splits on `.` that aren't inside quoted strings, so decimal numbers like `3.14` work fine inside expressions.
 
 ### Case insensitivity
 
-All keywords are case-insensitive. `SET`, `Say`, `REPEAT`, `If`, `HOW TO` all work. String contents are never touched — only bare words outside quotes get lowercased.
+All keywords are case-insensitive. `SET`, `Say`, `REPEAT`, `HOW TO` all work. String contents are never touched — only bare words outside quotes get lowercased.
 
-### Indentation and spaces
+### Indentation
 
-Indentation is completely ignored. The parser tracks block depth itself through block-opening keywords and `end.` statements — extra or missing spaces don't affect parsing at all. Indent for readability, not correctness.
+Indentation is completely ignored. The parser tracks block depth through block-opening keywords and `end.` statements. Indent for readability, not correctness.
 
 ---
 
@@ -149,15 +144,7 @@ otherwise.
 end.
 ```
 
-One `end.` closes the whole chain. Logical operators work inside conditions:
-
-```
-if age is at least 18 and verified is 1.
-    say "Access granted.".
-end.
-```
-
-Comparisons: `is`, `is not`, `is above`, `is below`, `is at least`, `is at most`
+One `end.` closes the whole chain. Comparisons: `is`, `is not`, `is above`, `is below`, `is at least`, `is at most`. Logical: `and`, `or`, `not`.
 
 ---
 
@@ -208,7 +195,7 @@ end.
 run greet with "Aman".
 ```
 
-`run` and `run function` do exactly the same thing. Multiple parameters are comma-separated after `with`.
+`run` and `run function` do the same thing. Multiple parameters are comma-separated after `with`.
 
 ---
 
@@ -233,9 +220,9 @@ endnotes.
 
 ---
 
-## Debugging tools
+## Debugging
 
-Inspect the generated Python without running it:
+Inspect generated Python without running it:
 
 ```
 python.
@@ -245,7 +232,7 @@ pythonend.
 
 Prints `PY_GEN: x =  5 + 3`.
 
-Trace tokens before each statement executes:
+Trace tokens before each statement:
 
 ```
 debug.
@@ -259,28 +246,14 @@ Prints `DEBUG: set x to 10`.
 
 ## Running Ethos
 
-Run a file:
-
 ```bash
-ethos myprogram.ethos
-```
-
-Open the REPL:
-
-```bash
-ethos
-```
-
-Check the installed version:
-
-```bash
-ethos --version
+ethos myprogram.ethos   # run a file
+ethos                   # open the REPL
+ethos --version         # check version
 ethos -v
 ```
 
-The REPL tracks open blocks. When you start an `if`, `while`, `repeat`, `count`, or `how to`, the prompt switches to `...` and buffers your input until you close with `end.`, then the whole block executes at once. Session history is saved to `~/.ethos/.ethos_history`.
-
-Type `exit` or `quit` to leave.
+The REPL tracks open blocks — when you start an `if`, `while`, `repeat`, `count`, or `how to`, the prompt switches to `...` and buffers input until you close with `end.`. Session history saves to `~/.ethos/.ethos_history`. Type `exit` or `quit` to leave.
 
 ---
 
@@ -288,31 +261,26 @@ Type `exit` or `quit` to leave.
 
 **Soft Traits** are Python packages. Forge installs them into `~/.ethos/traits/`, which Ethos prepends to `sys.path` at startup. Use them with `bring in`.
 
-**Hard Traits** are compiled shared libraries. At startup, Ethos scans `~/.ethos/traits/hard_traits/`, reads each trait's `manifest.json`, loads the `.so` with `ctypes.CDLL`, and wires up every exported function's signature from the manifest. The library is then available in your program's execution environment under the trait name.
+**Hard Traits** are compiled shared libraries. At startup, Ethos scans `~/.ethos/traits/hard_traits/`, reads each trait's `manifest.json`, loads the `.so` with `ctypes.CDLL`, and wires up every exported function's signature. The Hard Trait SDK for C/C++ and Rust is currently under development.
 
-Both kinds are managed by **Forge** → [github.com/amancode22/forge](https://github.com/amancode22/forge)
+Both kinds are managed by Forge → [github.com/AmanCode22/forge](https://github.com/AmanCode22/forge)
 
 ---
 
 ## What's next
 
-- Linux `.tar.gz` (compiler + install.sh), COPR, PPA, and AUR with pre-compiled package
 - macOS `.pkg` installer
 - Android via Termux
 - Hard Trait SDK for C/C++ and Rust
 - Eventually: rewrite the core in C, C++, or Rust
 
-## Expected Features(Not planned for now)
-- Language Server Protocol (LSP)
-- VSCode and Zed extensions
-- Ethos Studio — a GUI IDE
+**Expected later (not planned right now):** LSP support, VSCode/Zed extensions, Ethos Studio GUI IDE.
+
 ---
 
 ## Contributing
 
-Solo project, but contributions are welcome — especially Hard Trait SDK bindings for languages other than C/C++ and Rust, which I'm handling myself. If you want to write SDK support for Go, Java, Zig, or anything else, open a PR. Bug reports and fixes always appreciated.
-
-Open an issue before starting anything large so we don't duplicate effort.
+Solo project, but contributions are welcome — especially Hard Trait SDK bindings for Go, Java, Zig, or any language other than C/C++ and Rust (which I'm handling myself). Bug reports and fixes always appreciated. Open an issue before starting anything large so we don't duplicate effort.
 
 ---
 
@@ -329,7 +297,18 @@ ethos-lang/
     └── executer.py   — runner and Hard Trait loader
 ```
 
-Build instructions: [BUILDING.md](BUILDING.md). Full language reference: [DOCS.md](DOCS.md).
+Build instructions: [BUILDING.md](BUILDING.md)  
+Full language reference: [DOCS.md](DOCS.md)  
+Linux installation: [LINUX_INSTALL.md](LINUX_INSTALL.md)
+
+---
+
+## Related
+
+- Forge (package manager) → [github.com/AmanCode22/forge](https://github.com/AmanCode22/forge)
+- ethos-builder (build scripts, packaging) → [github.com/AmanCode22/ethos-builder](https://github.com/AmanCode22/ethos-builder)
+
+---
 
 ## License
 
