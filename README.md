@@ -57,7 +57,7 @@ Ethos bundles several Python standard libraries natively via shims. See [STDLIB\
 Solo project, but contributions are welcome — especially Hard Trait SDK bindings for Go, Java, Zig, or any language other than C/C++ and Rust (which I'm handling myself). Bug reports and fixes always appreciated. Open an issue before starting anything large so we don't duplicate effort.
 
 ## **Project layout**
-
+```
 ethos-lang/  
 ├── main.py  
 ├── requirements.txt  
@@ -68,7 +68,7 @@ ethos-lang/
     ├── executer.py    — runner and Hard Trait loader  
     ├── stdlib_shim.py — forces stdlib modules into the Nuitka binary  
     └── version.py     — version string
-
+```
 Build instructions: [BUILDING.md](http://docs.google.com/BUILDING.md)
 
 Full language reference: [DOCS.md](https://www.google.com/search?q=DOCS.md)
