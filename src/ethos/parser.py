@@ -1,3 +1,17 @@
+TYPE_CASTS = {
+    "to number": "int",
+    "to decimal": "float",
+    "to text": "str",
+    "to boolean": "bool",
+    "to list": "list",
+    "to tuple": "tuple",
+    "to set": "set",
+    "to dictionary": "dict",
+    "to bytes": "bytes",
+    "to complex": "complex",
+}
+
+
 def convert_operation(operation):
     mapping = {
         "is": "==",
@@ -18,7 +32,25 @@ def convert_operation(operation):
     return mapping.get(operation, operation)
 
 
+def apply_casts(expr, cast_chain):
+    for cast in reversed(cast_chain):
+        py_func = TYPE_CASTS[cast]
+        expr = f"{py_func}({expr})"
+    return expr
+
+
 def preprocess_tokens(tokens_list):
+    BLOCK_KEYWORDS = {"end", "otherwise", "if", "while", "repeat", "count", "how"}
+
+    cleaned = []
+    for token in tokens_list:
+        base = token.rstrip(".")
+        if base in BLOCK_KEYWORDS:
+            cleaned.append(base)
+        else:
+            cleaned.append(token)
+    tokens_list = cleaned
+
     multi_words_mapper = [
         "is not",
         "is above",
@@ -32,7 +64,18 @@ def preprocess_tokens(tokens_list):
         "otherwise if",
         "run function",
         "delete variable",
+        "to number",
+        "to decimal",
+        "to text",
+        "to boolean",
+        "to list",
+        "to tuple",
+        "to set",
+        "to dictionary",
+        "to bytes",
+        "to complex",
     ]
+
     i = 0
     processed = []
     while i < len(tokens_list):
@@ -88,65 +131,93 @@ def parse(all_tokens):
 
         if indent_level < 0:
             indent_level = 0
+
         padding = " " * (indent_level * 4)
         line_content = ""
 
         if first == "note":
             line_content = f"# {' '.join(tokens[1:])}\n"
+
         elif first in ["notes", "endnotes"]:
             line_content = "'''\n"
+
         elif first == "say":
             if len(tokens) < 2:
                 print("Error: 'say' needs a value")
                 return ""
             line_content = f"print({tokens[1]})\n"
+
         elif first == "set":
+            var_name = tokens[1]
             if "from" in tokens and "to" in tokens:
-                line_content = f"{tokens[1]} = {tokens[1]}[{tokens[3]}:{tokens[5]}]\n"
+                line_content = f"{var_name} = {var_name}[{tokens[3]}:{tokens[5]}]\n"
+            elif len(tokens) > 3 and tokens[3] in ("run", "run function"):
+                run_tokens = tokens[3:]
+                r_first = run_tokens[0]
+                start_idx = 2 if r_first == "run function" else 1
+                if "with" in run_tokens:
+                    w_idx = run_tokens.index("with")
+                    f_name = "".join(run_tokens[start_idx:w_idx])
+                    f_args = ", ".join([a.rstrip(",") for a in run_tokens[w_idx + 1 :]])
+                else:
+                    f_name = "".join(run_tokens[start_idx:])
+                    f_args = ""
+                line_content = f"{var_name} = {f_name}({f_args})\n"
             else:
-                line_content = f"{tokens[1]} =  {' '.join([convert_operation(t) for t in tokens[3:]])}\n"
+                rhs_tokens = tokens[3:]
+                cast_chain = []
+                while rhs_tokens and rhs_tokens[-1] in TYPE_CASTS:
+                    cast_chain.append(rhs_tokens.pop())
+                expr = " ".join([convert_operation(t) for t in rhs_tokens])
+                if cast_chain:
+                    expr = apply_casts(expr, cast_chain)
+                line_content = f"{var_name} = {expr}\n"
+
         elif first == "add":
             line_content = f"{tokens[-1]} += {' '.join([convert_operation(t) for t in tokens[1 : tokens.index('to')]])}\n"
+
         elif first == "subtract":
             line_content = f"{tokens[-1]} -= {' '.join([convert_operation(t) for t in tokens[1 : tokens.index('from')]])}\n"
+
         elif first == "bring in":
             line_content = f"import {tokens[1]}\n"
-        elif first == "run":
-            if tokens[1] == "function":
-                args = (
-                    ", ".join([i.rstrip(",") for i in tokens[4:]])
-                    if "with" in tokens
-                    else ""
-                )
-                line_content = f"{tokens[2]}({args})\n"
+
+        elif first in ("run", "run function"):
+            start_idx = 2 if first == "run function" else 1
+            if "with" in tokens:
+                with_idx = tokens.index("with")
+                func_name = "".join(tokens[start_idx:with_idx])
+                args = ", ".join([a.rstrip(",") for a in tokens[with_idx + 1 :]])
             else:
-                args = (
-                    ", ".join([i.rstrip(",") for i in tokens[3:]])
-                    if "with" in tokens
-                    else ""
-                )
-                line_content = f"{tokens[1]}({args})\n"
+                func_name = "".join(tokens[start_idx:])
+                args = ""
+            line_content = f"{func_name}({args})\n"
+
         elif first == "how to":
             args = (
                 ", ".join(
-                    [i.rstrip(",") for i in tokens[tokens.index("with") + 1 : -1]]
+                    [a.rstrip(",") for a in tokens[tokens.index("with") + 1 : -1]]
                 )
                 if "with" in tokens
                 else ""
             )
             line_content = f"def {tokens[1]}({args}):\n"
-        elif first in ["if", "while"]:
+
+        elif first in ("if", "while"):
             py_kw = "if" if first == "if" else "while"
             cond = " ".join([convert_operation(t) for t in tokens[1:-1]])
             line_content = f"{py_kw} {cond}:\n"
+
         elif first == "otherwise":
             if len(tokens) > 2 and tokens[1] == "if":
                 cond = " ".join([convert_operation(t) for t in tokens[2:-1]])
                 line_content = f"elif {cond}:\n"
             else:
                 line_content = "else:\n"
+
         elif first == "repeat":
             line_content = f"for _ in range({tokens[1]}):\n"
+
         elif first == "count":
             var = tokens[tokens.index("variable") + 1]
             start, end = tokens[2], tokens[4]
@@ -155,29 +226,25 @@ def parse(all_tokens):
             line_content = (
                 f"for {var} in range({start}, int({end}) {offset}, {step}):\n"
             )
+
         elif first == "delete variable":
             line_content = f"del {tokens[1]}\n"
+
         elif first == "ask":
-            if not len(tokens) == 4:
-                print(
-                    "Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name"
-                )
-                return
-            if tokens[2] != "into":
+            if len(tokens) != 4 or tokens[2] != "into":
                 print(
                     "Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name"
                 )
                 return
             line_content = f"{tokens[3]} = input({tokens[1]})\n"
+
         if line_content:
             if debug_mode:
                 final_code += f"{padding}print('DEBUG: {' '.join(tokens)}')\n"
             if python_mode:
                 final_code += f"{padding}print('PY_GEN: {line_content.strip()}')\n"
-
             final_code += padding + line_content
-
-            if first in ["how to", "if", "while", "otherwise", "repeat", "count"]:
+            if first in ("how to", "if", "while", "otherwise", "repeat", "count"):
                 indent_level += 1
 
     return final_code
