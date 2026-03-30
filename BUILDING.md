@@ -36,12 +36,12 @@ python3 -m venv ethos_build_env
 ./ethos_build_env/bin/pip install -r requirements.txt
 mkdir binary/
 unset LDFLAGS
-./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --no-strip -o binary/ethos main.py
+./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos main.py
 ```
 
 The compiled binary lands in `binary/ethos`.
 
-> `--no-strip` is important — without it the environment may strip the binary after Nuitka builds it, which destroys the self-extracting payload and causes a `couldn't find attached data header` error at runtime.
+> `--unstripped` is important — without it the environment may strip the binary after Nuitka builds it, which destroys the self-extracting payload and causes a `couldn't find attached data header` error at runtime.
 
 ---
 
@@ -83,7 +83,7 @@ cd ethos-lang/
 python3 -m venv ethos_build_env
 ./ethos_build_env/bin/pip install -r requirements.txt
 mkdir binary/
-./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --no-strip -o binary/ethos main.py
+./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos main.py
 ```
 
 This produces a binary for the architecture you're currently on — arm64 if you're on Apple Silicon, x86_64 if you're on Intel.
@@ -95,7 +95,7 @@ Nuitka doesn't natively produce universal binaries directly, so the approach is 
 **Step 1 — build the arm64 binary** (on an Apple Silicon Mac):
 
 ```bash
-arch -arm64 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --no-strip -o binary/ethos-arm64 main.py
+arch -arm64 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos-arm64 main.py
 ```
 
 **Step 2 — build the x86_64 binary** (on an Intel Mac, or on Apple Silicon using Rosetta):
@@ -104,7 +104,7 @@ arch -arm64 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --no-
 # On Apple Silicon using Rosetta:
 arch -x86_64 /usr/bin/python3 -m venv ethos_build_env_x86
 arch -x86_64 ./ethos_build_env_x86/bin/pip install -r requirements.txt
-arch -x86_64 ./ethos_build_env_x86/bin/python3 -m nuitka --standalone --onefile --no-strip -o binary/ethos-x86_64 main.py
+arch -x86_64 ./ethos_build_env_x86/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos-x86_64 main.py
 ```
 
 **Step 3 — combine with lipo:**
@@ -138,7 +138,7 @@ arch -x86_64 /usr/local/bin/brew install python@3.12
 
 arch -x86_64 /usr/local/bin/python3.12 -m venv ethos_build_env_x86
 arch -x86_64 ./ethos_build_env_x86/bin/pip install -r requirements.txt
-arch -x86_64 ./ethos_build_env_x86/bin/python3 -m nuitka --standalone --onefile --no-strip -o binary/ethos-x86_64 main.py
+arch -x86_64 ./ethos_build_env_x86/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos-x86_64 main.py
 ```
 
 ### Cross-compiling arm64 on Intel (not recommended)
