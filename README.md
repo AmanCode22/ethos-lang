@@ -40,11 +40,21 @@ end.
 
 A combined installer for both **Ethos and Forge** is on the [releases page](https://github.com/AmanCode22/ethos-lang/releases). That's the easiest way to get both tools at once. There's also a standalone compiled `.exe` for Ethos only on the same page if that's all you need. The installer sets up PATH and registers the `.ethos` file extension automatically.
 
+### macOS
+
+A combined `.pkg` installer for both **Ethos and Forge** is on the [releases page](https://github.com/AmanCode22/ethos-lang/releases). One package installs both tools and adds them to your PATH. There is no separate Forge `.pkg` — they ship together.
+
+See [MACOS_INSTALL.md](MACOS_INSTALL.md) for manual install, build from source, and DarlingHQ instructions.
+
 ### Linux
 
 See [LINUX_INSTALL.md](LINUX_INSTALL.md) for all options — OBS repos, AUR, and the universal tarball.
 
 The pre-built binary on the [releases page](https://github.com/AmanCode22/ethos-lang/releases) is a standalone compiled executable. No Python needed.
+
+### Android (Termux)
+
+Coming soon.
 
 ### From source
 
@@ -261,7 +271,7 @@ The REPL tracks open blocks — when you start an `if`, `while`, `repeat`, `coun
 
 **Soft Traits** are Python packages. Forge installs them into `~/.ethos/traits/`, which Ethos prepends to `sys.path` at startup. Use them with `bring in`.
 
-**Hard Traits** are compiled shared libraries. At startup, Ethos scans `~/.ethos/traits/hard_traits/`, reads each trait's `manifest.json`, loads the `.so` with `ctypes.CDLL`, and wires up every exported function's signature. The Hard Trait SDK for C/C++ and Rust is currently under development.
+**Hard Traits** are compiled shared libraries. At startup, Ethos scans `~/.ethos/traits/hard_traits/`, reads each trait's `manifest.json`, loads the `.so` with `ctypes.CDLL`, and wires up every exported function's signature. The Hard Trait SDK for C/C++ and Rust is coming soon.
 
 Both kinds are managed by Forge → [github.com/AmanCode22/forge](https://github.com/AmanCode22/forge)
 
@@ -271,10 +281,8 @@ The compiled binary bundles a set of standard library modules so Soft Traits can
 
 ## What's next
 
-- macOS `.pkg` installer
 - Android via Termux
 - Hard Trait SDK for C/C++ and Rust
-- Eventually: rewrite the core in C, C++, or Rust
 
 **Expected later (not planned right now):** LSP support, VSCode/Zed extensions, Ethos Studio GUI IDE.
 
@@ -293,15 +301,18 @@ ethos-lang/
 ├── main.py
 ├── requirements.txt
 └── src/ethos/
-    ├── cli.py        — REPL and file runner
-    ├── lexer.py      — sentence splitter and tokenizer
-    ├── parser.py     — transpiler to Python
-    └── executer.py   — runner and Hard Trait loader
+    ├── cli.py         — REPL and file runner
+    ├── lexer.py       — sentence splitter and tokenizer
+    ├── parser.py      — transpiler to Python
+    ├── executer.py    — runner and Hard Trait loader
+    ├── stdlib_shim.py — forces stdlib modules into the Nuitka binary
+    └── version.py     — version string
 ```
 
-Build instructions: [BUILDING.md](BUILDING.md)  
-Full language reference: [DOCS.md](DOCS.md)  
-Linux installation: [LINUX_INSTALL.md](LINUX_INSTALL.md)  
+Build instructions: [BUILDING.md](BUILDING.md)
+Full language reference: [DOCS.md](DOCS.md)
+Linux installation: [LINUX_INSTALL.md](LINUX_INSTALL.md)
+macOS installation: [MACOS_INSTALL.md](MACOS_INSTALL.md)
 Bundled stdlib modules: [STDLIB_SHIMS.md](STDLIB_SHIMS.md)
 
 ---
