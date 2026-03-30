@@ -33,111 +33,111 @@ Two passes happen before anything runs.
 **Pass 2 — tokenize.** Each sentence is split into words using POSIX-style shell splitting via shlex.split, which keeps quoted strings intact. Every token that isn't a quoted string is lowercased. The trailing . is stripped from the last token.
 
 A pre-processing step then merges multi-word phrases into single tokens before the parser sees them:
-
+```
 is not           is above        is below         is at least  
 is at most       divided by      to the power of  bring in  
 how to           otherwise if    run function     delete variable  
 to number        to decimal      to text          to boolean  
 to list          to tuple        to set           to dictionary  
 to bytes         to complex
-
+```
 The merger tries lengths 4, 3, and 2 in that order — so to the power of (length 4\) takes priority over any shorter overlap.
 
 ## **3\. Statements**
 
 ### **say — print**
-
-say \<value\>.
+```
+say <value>.
 
 say "Hello.".  
 say score.  
 say 42\.
-
+```
 Transpiles to print(\<value\>).
 
 ### **set — assign a variable**
-
-set \<var\> to \<expression\>.
-
+```
+set <var> to <expression>.
+```
 Expressions can mix variables, literals, and arithmetic operators.
-
-set x to 10\.  
+```
+set x to 10.  
 set name to "Aman".  
-set total to x times 3 plus 1\.
-
+set total to x times 3 plus 1.
+```
 **String Slicing:** Detected when both from and to appear in the token list:
-
-set \<var\> to \<source\> from \<start\> to \<end\>.  
-set piece to name from 0 to 3\.
-
+```
+set <var> to <source> from <start> to <end>.  
+set piece to name from 0 to 3.
+```
 Transpiles to piece \= name\[0:3\].
 
 **Storing Function Output:** You can assign the result of a function or method directly to a variable using run:
-
-set response to run requests.get with "\[https://google.com\](https://google.com)".  
-set random\_num to run random.randint with 1, 10\.
-
+```
+set response to run requests.get with "https://google.com".  
+set random_num to run random.randint with 1, 10.
+```
 Transpiles to response \= requests.get("https://google.com").
 
 ### **add / subtract — in-place arithmetic**
-
-add \<value\> to \<var\>.  
-subtract \<value\> from \<var\>.
+```
+add <value> to <var>.  
+subtract <value> from <var>.
 
 add 1 to counter.  
 subtract 5 from health.
-
+```
 Transpiles to counter \+= 1 and health \-= 5.
 
 ### **delete variable — delete a variable**
-
-delete variable \<name\>.
-
+```
+delete variable <name>.
+```
 Transpiles to del name.
 
 ### **ask — read input**
-
-ask \<"prompt"\> into \<var\>.
-
+```
+ask <"prompt"> into <var>.
+```
 Must be exactly four tokens. into is required in position 3\. Note that ask always returns text (a string). If you need a number, use type casting (see section 5).
-
+```
 ask "Your name: " into username.
-
+```
 Transpiles to username \= input("Your name: ").
 
 ### **if / otherwise / end — conditionals**
-
-if \<condition\>.  
+```
+if <condition>.  
     ...  
-otherwise if \<condition\>.  
+otherwise if <condition>.  
     ...  
 otherwise.  
     ...  
 end.
-
+```
 One end. closes the whole chain. otherwise if becomes elif, bare otherwise becomes else. Conditions can chain with and, or, and not:
-
-if age is at least 18 and verified is 1\.  
+```
+if age is at least 18 and verified is 1.  
     say "Access granted.".  
 end.
-
+```
 ### **repeat — loop N times**
-
-repeat \<n\>.  
+```
+repeat <n>.  
     ...  
 end.
-
+```
 Loop variable is anonymous (\_). Transpiles to for \_ in range(n):.
 
 ### **count — ranged loop**
-
-count from \<start\> to \<end\> variable \<var\>.  
+```
+count from <start> to <end> variable <var>.  
     ...  
 end.
-
+```
 Optional step:
-
-count from \<start\> to \<end\> variable \<var\> stepping \<step\>.  
+```
+count from <start> to <end> variable <var> stepping <step>.  
     ...  
 end.
 
@@ -145,86 +145,86 @@ count from 1 to 5 variable i.
     say i.  
 end.
 
-count from 10 to 0 variable i stepping \-2.  
+count from 10 to 0 variable i stepping -2.  
     say i.  
 end.
-
+```
 The parser detects direction from the step sign and adjusts the range end by \+1 for forward loops and \-1 for backward loops.
 
 ### **while — condition loop**
-
-while \<condition\>.  
+```
+while <condition>.  
     ...  
 end.
 
-while lives is above 0\.  
+while lives is above 0.  
     subtract 1 from lives.  
 end.
-
+```
 ### **how to / run — functions**
 
 Define:
-
-how to \<name\>.  
+```
+how to <name>.  
     ...  
 end.
 
-how to \<name\> with \<param1\>, \<param2\>.  
+how to <name> with <param1>, <param2>.  
     ...  
 end.
-
+```
 Call:
 
-run \<name\>.  
-run \<name\> with \<arg1\>, \<arg2\>.  
-run function \<name\> with \<arg1\>.
-
+run <name>.  
+run <name> with <arg1>, <arg2>.  
+run function <name> with <arg1>.
+```
 run and run function are identical — both exist so code reads naturally either way. **Dot-notation** is natively supported for calling nested functions and module methods:
-
+```
 bring in requests.  
-run requests.get with "\[https://api.github.com\](https://api.github.com)".
+run requests.get with "https://api.github.com".
 
 how to greet with name.  
     say name.  
 end.
 
 run greet with "Aman".
-
+```
 ### **bring in — import a module or Soft Trait**
-
-bring in \<module\>.
-
+```
+bring in <module>.
+```
 Transpiles to import \<module\>.
 
 ### **note / notes — comments**
-
+```
 note single line comment.
 
 notes.  
 block comment  
 spanning lines.  
 endnotes.
-
+```
 Single-line notes transpile to \# .... Block notes use ''' ... '''.
 
 ### **python / pythonend — inspect generated Python**
 
 Statements inside this block print the transpiled Python instead of running it.
-
+```
 python.  
-set x to 5 plus 3\.  
+set x to 5 plus 3.  
 pythonend.
-
+```
 Output: PY\_GEN: x \= 5 \+ 3
 
 ### **debug / debugend — trace tokens**
 
 Prints the full token list for each statement before it executes.
-
+```
 debug.  
-set x to 10\.  
+set x to 10.  
 debugend.
-
+```
 Output: DEBUG: set x to 10
 
 ## **4\. Operators**
@@ -276,9 +276,9 @@ Ethos supports **postfix type casting** on the right side of set assignments. Th
 | to complex | complex() | set math\_c to 5 to complex. |
 
 **Chaining casts:** You can chain conversions together. They process from left to right.
-
+```
 set score to "95.5" to decimal to number.
-
+```
 *(Transpiles to score \= int(float("95.5")))*
 
 ## **6\. Hard Trait runtime format**
