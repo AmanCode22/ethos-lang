@@ -286,30 +286,30 @@ set score to "95.5" to decimal to number.
 The Hard Trait SDK is still in development. This section documents what the Ethos runtime expects from an installed Hard Trait — enough to understand loading, not enough to write one from scratch yet. Community SDK contributions for languages other than C/C++ and Rust are welcome via PR.
 
 ### **Directory layout**
-
-\~/.ethos/traits/hard\_traits/\<trait-name\>/  
+```
+~/.ethos/traits/hard\_traits/\<trait-name\>/
 ├── manifest.json  
 └── \<binary\>.so
-
+```
 The folder name must match the name field in manifest.json.
 
 ### **manifest.json**
-
+```
 {  
   "name": "mymath",  
   "binary": "mymath.so",  
   "functions": {  
     "add\_ints": {  
       "return": "int",  
-      "args": \["int", "int"\]  
+      "args": ["int", "int"]  
     },  
-    "get\_message": {  
-      "return": "char \*",  
-      "args": \[\]  
+    "get_message": {  
+      "return": "char *",  
+      "args": []  
     }  
   }  
 }
-
+``` 
 | Field | Required | Description |
 | :---- | :---- | :---- |
 | name | yes | Trait name. Must match the directory name. |
