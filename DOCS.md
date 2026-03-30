@@ -97,7 +97,7 @@ Transpiles to del name.
 
 ### **ask — read input**
 ```
-ask <"prompt"> into <var>.
+ask "<prompt>" into <var>.
 ```
 Must be exactly four tokens. into is required in position 3\. Note that ask always returns text (a string). If you need a number, use type casting (see section 5).
 ```
@@ -174,7 +174,7 @@ how to <name> with <param1>, <param2>.
 end.
 ```
 Call:
-
+```
 run <name>.  
 run <name> with <arg1>, <arg2>.  
 run function <name> with <arg1>.
