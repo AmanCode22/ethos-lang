@@ -1,5 +1,6 @@
 # Ethos
-[Ethos Logo](ethos_logo.png)
+<img src="ethos_logo.png" alt="Ethos Logo" width="500">
+
 **A language that speaks for itself.**
 
 Ethos transpiles English-like syntax to Python. Every statement ends with a period. No brackets, no semicolons.
