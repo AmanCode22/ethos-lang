@@ -1,34 +1,28 @@
 # Installing Ethos on macOS
 
-The pre-built binary on the [releases page](https://github.com/AmanCode22/ethos-lang/releases) is a standalone compiled executable — no Python required to run it.
+Pre-built binaries are standalone — no Python required at runtime.
 
 ---
 
-## Option 1 — .pkg Installer (recommended)
+## Option 1 — .pkg Installer (Recommended)
 
-The `.pkg` on the [releases page](https://github.com/AmanCode22/ethos-lang/releases) installs both **Ethos and Forge** in one shot. There is no separate Forge `.pkg` — they ship together.
+Single installer for both **Ethos and Forge**.
 
-Download macos pkg files for your architecture and double-click it. The installer copies `ethos` and `forge` to `/usr/local/bin/` and they're immediately available in your terminal.
+**Download** from [releases](https://github.com/AmanCode22/ethos-lang/releases) and double-click. Installs to `/usr/local/bin/`.
 
 ---
 
-## Option 2 — Manual install from pre-built binary
+## Option 2 — Manual Install
 
-Download the standalone `ethos` binary from the [releases page](https://github.com/AmanCode22/ethos-lang/releases), then:
+**Download** standalone binaries from [releases](https://github.com/AmanCode22/ethos-lang/releases):
 
 ```bash
-chmod +x ethos
+chmod +x ethos forge
 sudo mv ethos /usr/local/bin/ethos
-```
-
-Do the same for `forge` from the [Forge releases page](https://github.com/AmanCode22/forge/releases):
-
-```bash
-chmod +x forge
 sudo mv forge /usr/local/bin/forge
 ```
 
-Verify:
+**Verify:**
 
 ```bash
 ethos --version
@@ -37,28 +31,23 @@ forge --version
 
 ---
 
-## Option 3 — Build from source
+## Option 3 — Build from Source
 
-See [BUILDING.md](BUILDING.md) for the full build instructions including native builds, universal binaries, cross-compilation via Rosetta, and how to produce the `.pkg` installer yourself.
+See [BUILDING.md](BUILDING.md) for native builds, universal binaries, and .pkg creation.
 
 ---
 
-## DarlingHQ (running macOS Ethos binaries on Linux)
-
-[Darling](https://www.darlinghq.org/) is a macOS compatibility layer for Linux. If you want to run the macOS Ethos binary on a Linux machine:
+## Using Darling (Linux → macOS binary testing)
 
 ```bash
-# Install Darling for your distro — see https://docs.darlinghq.org/installation.html
+# Install Darling: https://docs.darlinghq.org/installation.html
 
-# Enter the Darling shell
 darling shell
-
-# Run ethos inside Darling
 ethos --version
 ethos myprogram.ethos
 ```
 
-Darling is useful for testing and running `.ethos` programs, but building the macOS binary itself should be done on a real Mac. See [BUILDING.md](BUILDING.md) for build steps.
+Darling is for testing only — build on real macOS for production.
 
 ---
 

@@ -4,7 +4,7 @@ import shlex
 
 def split_sentences(raw_text):
     sentences = re.findall(
-        r"""((?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\d+\.\d+|[^.])+\.)""", raw_text
+        r"""((?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\d+\.\d+|[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*|[^.])+\.)""", raw_text
     )
     final_sentences = []
     for i in sentences:
@@ -21,9 +21,12 @@ def tokenize_and_normalize(sentence):
     for i in words:
         if i.startswith('"') or i.startswith("'"):
             final_words.append(i)
-        else:
+        elif i:
             final_words.append(i.lower())
-    final_words[-1] = final_words[-1][:-1]
+    if final_words and final_words[-1] == '.':
+        final_words.pop()
+    elif final_words:
+        final_words[-1] = final_words[-1][:-1]
     return final_words
 
 

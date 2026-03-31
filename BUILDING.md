@@ -2,32 +2,28 @@
 
 ## Prerequisites
 
-- Python 3.10 or newer (with pip)
-- Git (or download the repo zip and extract it yourself)
+- Python 3.10+ (with pip)
+- Git
 
 ---
 
 ## Linux
 
-Install the packages Nuitka needs for your distro first:
+**Install build dependencies:**
 
-**Ubuntu / Debian and derivatives**
 ```bash
+# Ubuntu/Debian
 sudo apt update
 sudo apt install python3 python3-dev build-essential patchelf
-```
 
-**Fedora / RHEL and derivatives**
-```bash
+# Fedora/RHEL
 sudo dnf install python3 python3-devel gcc gcc-c++ patchelf
-```
 
-**Arch Linux / Manjaro and derivatives**
-```bash
+# Arch/Manjaro
 sudo pacman -S python base-devel patchelf
 ```
 
-Then build:
+**Build:**
 
 ```bash
 git clone https://github.com/AmanCode22/ethos-lang
@@ -39,15 +35,13 @@ unset LDFLAGS
 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos main.py
 ```
 
-The compiled binary lands in `binary/ethos`.
+Output: `binary/ethos`
 
-> `--unstripped` is important — without it the environment may strip the binary after Nuitka builds it, which destroys the self-extracting payload and causes a `couldn't find attached data header` error at runtime.
+> `--unstripped` is required. Without it, the system may strip the binary after Nuitka builds it, breaking the self-extracting payload.
 
 ---
 
 ## Windows
-
-Open PowerShell in the source directory:
 
 ```powershell
 pip install --upgrade pip
@@ -55,27 +49,20 @@ pip install -r requirements.txt
 python -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=ethos.exe
 ```
 
-You get `ethos.exe` in the current folder.
+Output: `ethos.exe`
 
 ---
 
 ## macOS
 
-You need Python 3.10+ and the Xcode command line tools:
+**Install dependencies:**
 
 ```bash
 xcode-select --install
-```
-
-Then install Nuitka's dependencies. The simplest way is via Homebrew:
-
-```bash
 brew install python@3.12 ccache
 ```
 
-### Native build (build for the architecture you're running on)
-
-This works on both Apple Silicon (arm64) and Intel (x86_64) Macs. Run this on the machine you want to build for:
+### Native Build (single architecture)
 
 ```bash
 git clone https://github.com/AmanCode22/ethos-lang
@@ -86,28 +73,27 @@ mkdir binary/
 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos main.py
 ```
 
-This produces a binary for the architecture you're currently on — arm64 if you're on Apple Silicon, x86_64 if you're on Intel.
+Produces `arm64` binary on Apple Silicon, `x86_64` on Intel.
 
-### Building a Universal Binary (arm64 + x86_64 in one file)
+### Universal Binary (arm64 + x86_64)
 
-Nuitka doesn't natively produce universal binaries directly, so the approach is to build both architectures separately and then combine them with `lipo`. You need access to both architectures — either two machines, or an Intel Mac using Rosetta.
+Nuitka doesn't produce universal binaries directly. Build both architectures separately, then combine with `lipo`.
 
-**Step 1 — build the arm64 binary** (on an Apple Silicon Mac):
+**Step 1 — Build arm64 (on Apple Silicon):**
 
 ```bash
 arch -arm64 ./ethos_build_env/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos-arm64 main.py
 ```
 
-**Step 2 — build the x86_64 binary** (on an Intel Mac, or on Apple Silicon using Rosetta):
+**Step 2 — Build x86_64 (on Intel or via Rosetta):**
 
 ```bash
-# On Apple Silicon using Rosetta:
 arch -x86_64 /usr/bin/python3 -m venv ethos_build_env_x86
 arch -x86_64 ./ethos_build_env_x86/bin/pip install -r requirements.txt
 arch -x86_64 ./ethos_build_env_x86/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos-x86_64 main.py
 ```
 
-**Step 3 — combine with lipo:**
+**Step 3 — Combine:**
 
 ```bash
 lipo -create binary/ethos-arm64 binary/ethos-x86_64 -output binary/ethos
@@ -117,84 +103,44 @@ lipo -create binary/ethos-arm64 binary/ethos-x86_64 -output binary/ethos
 
 ```bash
 file binary/ethos
-# Should show: Mach-O universal binary with 2 architectures: [x86_64] [arm64]
+# Should show: Mach-O universal binary with 2 architectures
 lipo -info binary/ethos
 ```
 
-### Building x86_64 on x86_64 (Intel Mac)
+### Building .pkg Installer
 
-Straightforward — just run the native build above on an Intel Mac. No extra flags needed.
-
-### Building arm64 on arm64 (Apple Silicon)
-
-Same — just run the native build above on an Apple Silicon Mac.
-
-### Cross-compiling x86_64 on Apple Silicon (Rosetta)
+Requires `pkgbuild` and `productbuild` (Xcode command line tools).
 
 ```bash
-# Install an x86_64 Python via Homebrew under Rosetta
-arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-arch -x86_64 /usr/local/bin/brew install python@3.12
-
-arch -x86_64 /usr/local/bin/python3.12 -m venv ethos_build_env_x86
-arch -x86_64 ./ethos_build_env_x86/bin/pip install -r requirements.txt
-arch -x86_64 ./ethos_build_env_x86/bin/python3 -m nuitka --standalone --onefile --unstripped -o binary/ethos-x86_64 main.py
-```
-
-### Cross-compiling arm64 on Intel (not recommended)
-
-True cross-compilation from x86_64 to arm64 on macOS is not straightforward with Nuitka. The recommended approach is to build natively on Apple Silicon or use a CI runner with an arm64 Mac (GitHub Actions has `macos-14` which runs on Apple Silicon).
-
-### Building a .pkg installer for macOS
-
-The `.pkg` installer ships both `ethos` and `forge` together. There is no separate Forge `.pkg`. To build the installer yourself you need `pkgbuild` and `productbuild`, which come with Xcode command line tools.
-
-First build both binaries (ethos and forge), then:
-
-```bash
-# Create staging directory
 mkdir -p pkg_root/usr/local/bin
 cp binary/ethos pkg_root/usr/local/bin/ethos
 cp /path/to/forge/binary/forge pkg_root/usr/local/bin/forge
-chmod +x pkg_root/usr/local/bin/ethos
-chmod +x pkg_root/usr/local/bin/forge
+chmod +x pkg_root/usr/local/bin/*
 
-# Build the component package
 pkgbuild \
   --root pkg_root \
   --identifier com.amancode22.ethos \
-  --version 0.3.0 \
   --install-location / \
   ethos-component.pkg
 
-# Build the final distribution package
 productbuild \
   --component ethos-component.pkg /usr/local \
   --identifier com.amancode22.ethos \
-  --version 0.3.0 \
-  Ethos-v0.3.0-macos.pkg
+  Ethos-macos.pkg
 ```
 
-The resulting `Ethos-v0.3.0-macos.pkg` installs both `ethos` and `forge` to `/usr/local/bin/`.
+Output: `Ethos-macos.pkg`
 
-> You can also use the pre-built binaries from the [releases page](https://github.com/AmanCode22/ethos-lang/releases) instead of building from source — just swap them into `pkg_root/usr/local/bin/` and run the pkgbuild steps above.
-
-### Using DarlingHQ (running macOS binaries on Linux)
-
-[Darling](https://www.darlinghq.org/) is a macOS compatibility layer for Linux. If you have Darling installed and want to run or test the macOS Ethos binary on Linux:
+### Using Darling (Linux → macOS binary testing)
 
 ```bash
-# Install Darling — see https://docs.darlinghq.org/installation.html for your distro
+# Install Darling: https://docs.darlinghq.org/installation.html
 
-# Enter the Darling shell
 darling shell
-
-# Inside the Darling shell, run ethos normally
 ./ethos --version
-./ethos myprogram.ethos
 ```
 
-Building the macOS binary itself inside Darling is not recommended — Darling doesn't expose the full Xcode toolchain needed by Nuitka. Build the macOS binary on a real Mac and use Darling only for running and testing it on Linux.
+Darling is for running/testing only — build on real macOS for production binaries.
 
 ---
 
@@ -204,4 +150,4 @@ Coming soon.
 
 ---
 
-For packaging scripts, OBS spec files, Debian control files, and the Windows installer script, see [ethos-builder](https://github.com/AmanCode22/ethos-builder).
+For OBS spec files, Debian control files, and Windows installer scripts, see [ethos-builder](https://github.com/AmanCode22/ethos-builder).

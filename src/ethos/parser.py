@@ -35,7 +35,10 @@ def convert_operation(operation):
 def apply_casts(expr, cast_chain):
     for cast in reversed(cast_chain):
         py_func = TYPE_CASTS[cast]
-        expr = f"{py_func}({expr})"
+        if cast == "to bytes":
+            expr = f'{py_func}({expr}, "utf-8")'
+        else:
+            expr = f"{py_func}({expr})"
     return expr
 
 
@@ -93,11 +96,11 @@ def preprocess_tokens(tokens_list):
     return processed
 
 
-def parse(all_tokens):
+def parse(all_tokens,debug_mode=False,python_mode=False):
     final_code = ""
     indent_level = 0
-    python_mode = False
-    debug_mode = False
+    in_multiline_comment = False
+    multiline_comment_content = []
 
     for sentence in all_tokens:
         tokens = preprocess_tokens(sentence)
@@ -106,19 +109,6 @@ def parse(all_tokens):
 
         first = tokens[0]
 
-        if first == "python":
-            python_mode = True
-            continue
-        elif first == "pythonend":
-            python_mode = False
-            continue
-        elif first == "debug":
-            debug_mode = True
-            continue
-        elif first == "debugend":
-            debug_mode = False
-            continue
-
         if first == "end":
             indent_level -= 1
             if indent_level < 0:
@@ -126,20 +116,28 @@ def parse(all_tokens):
                 return ""
             continue
 
-        if first == "otherwise":
-            indent_level -= 1
 
         if indent_level < 0:
             indent_level = 0
 
         padding = " " * (indent_level * 4)
         line_content = ""
+        override_padding = None
 
         if first == "note":
             line_content = f"# {' '.join(tokens[1:])}\n"
 
-        elif first in ["notes", "endnotes"]:
-            line_content = "'''\n"
+        elif first == "notes":
+            in_multiline_comment = True
+            multiline_comment_content = []
+            line_content = None
+        elif first == "endnotes":
+            in_multiline_comment = False
+            line_content = "'''\n" + "\n".join(multiline_comment_content) + "\n'''\n"
+            multiline_comment_content = []
+        elif in_multiline_comment:
+            line_content = None
+            multiline_comment_content.append(' '.join(tokens))
 
         elif first == "say":
             if len(tokens) < 2:
@@ -150,7 +148,12 @@ def parse(all_tokens):
         elif first == "set":
             var_name = tokens[1]
             if "from" in tokens and "to" in tokens:
-                line_content = f"{var_name} = {var_name}[{tokens[3]}:{tokens[5]}]\n"
+                from_idx = tokens.index("from")
+                to_idx = tokens.index("to", from_idx)
+                source = tokens[from_idx - 1]
+                start = tokens[from_idx + 1]
+                end = tokens[to_idx + 1]
+                line_content = f"{var_name} = {source}[{start}:{end}]\n"
             elif len(tokens) > 3 and tokens[3] in ("run", "run function"):
                 run_tokens = tokens[3:]
                 r_first = run_tokens[0]
@@ -196,7 +199,7 @@ def parse(all_tokens):
         elif first == "how to":
             args = (
                 ", ".join(
-                    [a.rstrip(",") for a in tokens[tokens.index("with") + 1 : -1]]
+                    [a.rstrip(",") for a in tokens[tokens.index("with") + 1 :]]
                 )
                 if "with" in tokens
                 else ""
@@ -205,23 +208,31 @@ def parse(all_tokens):
 
         elif first in ("if", "while"):
             py_kw = "if" if first == "if" else "while"
-            cond = " ".join([convert_operation(t) for t in tokens[1:-1]])
+            cond = " ".join([convert_operation(t) for t in tokens[1:]])
             line_content = f"{py_kw} {cond}:\n"
 
+        elif first == "otherwise if":
+            cond = " ".join([convert_operation(t) for t in tokens[1:]])
+            line_content = f"elif {cond}:\n"
+            override_padding = (indent_level - 1) * 4
         elif first == "otherwise":
-            if len(tokens) > 2 and tokens[1] == "if":
-                cond = " ".join([convert_operation(t) for t in tokens[2:-1]])
-                line_content = f"elif {cond}:\n"
-            else:
-                line_content = "else:\n"
-
+            line_content = "else:\n"
+            override_padding = (indent_level - 1) * 4
         elif first == "repeat":
-            line_content = f"for _ in range({tokens[1]}):\n"
+            n = tokens[1]
+            line_content = f"for _ in range({n}):\n"
 
         elif first == "count":
             var = tokens[tokens.index("variable") + 1]
-            start, end = tokens[2], tokens[4]
-            step = tokens[6] if "stepping" in tokens else "1"
+            from_idx = tokens.index("from")
+            to_idx = tokens.index("to")
+            start = tokens[from_idx + 1]
+            end = tokens[to_idx + 1]
+            if "stepping" in tokens:
+                stepping_idx = tokens.index("stepping")
+                step = tokens[stepping_idx + 1]
+            else:
+                step = "1"
             offset = "- 1" if step.startswith("-") else "+ 1"
             line_content = (
                 f"for {var} in range({start}, int({end}) {offset}, {step}):\n"
@@ -242,9 +253,13 @@ def parse(all_tokens):
             if debug_mode:
                 final_code += f"{padding}print('DEBUG: {' '.join(tokens)}')\n"
             if python_mode:
-                final_code += f"{padding}print('PY_GEN: {line_content.strip()}')\n"
-            final_code += padding + line_content
-            if first in ("how to", "if", "while", "otherwise", "repeat", "count"):
+                escaped_content = line_content.strip().replace('\\', '\\\\').replace("'", "\\'")
+                final_code += f"{padding}print('PY_GEN: {escaped_content}')\n"
+            if override_padding is not None:
+                final_code += " " * override_padding + line_content
+            else:
+                final_code += padding + line_content
+            if first in ("how to", "if", "while", "repeat", "count"):
                 indent_level += 1
 
     return final_code

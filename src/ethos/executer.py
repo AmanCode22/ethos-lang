@@ -40,7 +40,7 @@ hard_traits_path = traits_path / "hard_traits"
 hard_traits_path.mkdir(parents=True, exist_ok=True)
 
 
-def create_enviroment():
+def create_environment():
     env = {}
     list_traits = os.listdir(hard_traits_path)
     for i in list_traits:
@@ -49,7 +49,7 @@ def create_enviroment():
         manifest_file = hard_traits_path / i / "manifest.json"
         if not manifest_file.exists():
             print(
-                f"Warning: Trait {i} does not have a manifest.json file. Failed to load it. Skipping...."
+                f"Warning: Trait {i} does not have a manifest.json file. Failed to load it. Skipping..."
             )
             continue
         with open(manifest_file, "r") as f:
@@ -57,19 +57,19 @@ def create_enviroment():
                 manifest = json.load(f)
             except:
                 print(
-                    f"Warning: Trait {i} manifest.json file is invalid and does not contains proper content, skipping it...."
+                    f"Warning: Trait {i} manifest.json file is invalid and does not contain proper content. Skipping..."
                 )
                 continue
         binary_path = manifest.get("binary")
         if not (hard_traits_path / i / binary_path).exists():
             print(
-                f"Warning: Trait {i} binary path defined in manifest.json is invalid, no file is found at that path. Failed to load it.Skipping...."
+                f"Warning: Trait {i} binary path defined in manifest.json is invalid, no file is found at that path. Failed to load it. Skipping..."
             )
             continue
         binary = ctypes.CDLL(str(hard_traits_path / i / binary_path))
-        if not "functions" in manifest:
+        if "functions" not in manifest:
             print(
-                f"Warning: Trait {i} manifest.json does not have functions key defined,failed to load trait {i}. Skipping it...."
+                f"Warning: Trait {i} manifest.json does not have functions key defined. Failed to load trait {i}. Skipping..."
             )
             continue
         for j in manifest["functions"]:
@@ -80,7 +80,7 @@ def create_enviroment():
                 c_func.argtypes = [ctypes_map[arg] for arg in func_data["args"]]
             except KeyError:
                 print(
-                    f"Warning: In trait {i} there is a function named {j} of which types are not correctly written in manifest.json, skipping loading it...."
+                    f"Warning: In trait {i}, function {j} has incorrectly written types in manifest.json. Skipping..."
                 )
                 continue
 
@@ -94,7 +94,7 @@ def run(python_code, memory_box=None):
     if not python_code or python_code == "":
         return
     if memory_box == None:
-        memory_box = create_enviroment()
+        memory_box = create_environment()
     try:
         exec(python_code, memory_box)
     except Exception as e:

@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from sys import exit
 
-from .executer import create_enviroment, run
+from .executer import create_environment, run
 from .lexer import lex
 from .parser import parse
 from .version import stage, version
@@ -55,16 +55,14 @@ def start_repl():
 
     if os.path.exists(history_path):
         readline.read_history_file(history_path)
-    repl_memory = create_enviroment()
+    repl_memory = create_environment()
     buffer = ""
     open_blocks = 0
-
+    python_mode = False
+    debug_mode = False
     while True:
         prompt = "... " if open_blocks > 0 else "ethos > "
         command_input = input(prompt)
-        if command_input.strip() in ("exit", "quit"):
-            readline.write_history_file(history_path)
-            break
         if not command_input.strip().endswith("."):
             command_input+="."
         tokens = lex(command_input)
@@ -72,7 +70,21 @@ def start_repl():
             continue
 
         first_token = tokens[0][0] if tokens[0] else ""
-
+        if first_token == "python":
+            python_mode = not python_mode
+            continue
+        elif first_token == "pythonend":
+            python_mode = False
+            continue
+        elif first_token == "debug":
+            debug_mode = not debug_mode
+            continue
+        elif first_token == "debugend":
+            debug_mode = False
+            continue
+        elif command_input.strip() in ("exit.", "quit.", "exit", "quit"):
+            readline.write_history_file(history_path)
+            break
         if first_token in BLOCK_OPENERS:
             open_blocks += 1
 
@@ -89,11 +101,10 @@ def start_repl():
                 block_tokens = lex(buffer)
                 buffer = ""
                 if block_tokens:
-                    python_code = parse(block_tokens)
+                    python_code = parse(block_tokens, debug_mode, python_mode)
                     if python_code and python_code.strip():
                         run(python_code, repl_memory)
             continue
-
-        python_code = parse(tokens)
+        python_code = parse(tokens, debug_mode, python_mode)
         if python_code and python_code.strip():
             run(python_code, repl_memory)
