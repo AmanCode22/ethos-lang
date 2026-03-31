@@ -93,7 +93,7 @@ def run(python_code, memory_box=None):
     sys.path.append(str(traits_path))
     if not python_code or python_code == "":
         return
-    if memory_box == None:
+    if memory_box is None:
         memory_box = create_environment()
     try:
         exec(python_code, memory_box)

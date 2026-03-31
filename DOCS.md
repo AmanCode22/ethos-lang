@@ -244,6 +244,17 @@ run requests.get with "https://api.github.com".
 
 ```ethos
 bring in <module>.
+
+bring in math.
+bring in requests.
+```
+
+Access module attributes and functions:
+
+```ethos
+bring in math.
+set pi to math.pi.
+set result to run function math.sqrt with 16.
 ```
 
 ---

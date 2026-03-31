@@ -156,8 +156,7 @@ def parse(all_tokens,debug_mode=False,python_mode=False):
                 line_content = f"{var_name} = {source}[{start}:{end}]\n"
             elif len(tokens) > 3 and tokens[3] in ("run", "run function"):
                 run_tokens = tokens[3:]
-                r_first = run_tokens[0]
-                start_idx = 2 if r_first == "run function" else 1
+                start_idx = 1
                 if "with" in run_tokens:
                     w_idx = run_tokens.index("with")
                     f_name = "".join(run_tokens[start_idx:w_idx])
@@ -186,7 +185,7 @@ def parse(all_tokens,debug_mode=False,python_mode=False):
             line_content = f"import {tokens[1]}\n"
 
         elif first in ("run", "run function"):
-            start_idx = 2 if first == "run function" else 1
+            start_idx = 1
             if "with" in tokens:
                 with_idx = tokens.index("with")
                 func_name = "".join(tokens[start_idx:with_idx])
@@ -247,14 +246,21 @@ def parse(all_tokens,debug_mode=False,python_mode=False):
                     "Invalid syntax used, correct syntax is ask 'Prompt string' into variable_name"
                 )
                 return
-            line_content = f"{tokens[3]} = input({tokens[1]})\n"
+            target = tokens[3]
+            if not target.isidentifier():
+                print(
+                    f"Error: '{target}' is not a valid variable name. Use a valid identifier (e.g., my_var, x, result)"
+                )
+                return
+            line_content = f"{target} = input({tokens[1]})\n"
 
         if line_content:
             if debug_mode:
-                final_code += f"{padding}print('DEBUG: {' '.join(tokens)}')\n"
+                debug_str = " ".join(tokens).replace('\\', '\\\\').replace("'", "\\'").replace('"', '\\"')
+                final_code += f'{padding}print("DEBUG: {debug_str}")\n'
             if python_mode:
-                escaped_content = line_content.strip().replace('\\', '\\\\').replace("'", "\\'")
-                final_code += f"{padding}print('PY_GEN: {escaped_content}')\n"
+                escaped_content = line_content.strip().replace('\\', '\\\\').replace("'", "\\'").replace('"', '\\"')
+                final_code += f'{padding}print("PY_GEN: {escaped_content}")\n'
             if override_padding is not None:
                 final_code += " " * override_padding + line_content
             else:

@@ -64,7 +64,7 @@ def start_repl():
         prompt = "... " if open_blocks > 0 else "ethos > "
         command_input = input(prompt)
         if not command_input.strip().endswith("."):
-            command_input+="."
+            command_input += "."
         tokens = lex(command_input)
         if not tokens:
             continue
