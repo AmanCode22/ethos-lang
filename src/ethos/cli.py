@@ -55,7 +55,6 @@ def start_repl():
 
     if os.path.exists(history_path):
         readline.read_history_file(history_path)
-
     repl_memory = create_enviroment()
     buffer = ""
     open_blocks = 0
@@ -63,11 +62,11 @@ def start_repl():
     while True:
         prompt = "... " if open_blocks > 0 else "ethos > "
         command_input = input(prompt)
-
         if command_input.strip() in ("exit", "quit"):
             readline.write_history_file(history_path)
             break
-
+        if not command_input.strip().endswith("."):
+            command_input+="."
         tokens = lex(command_input)
         if not tokens:
             continue
