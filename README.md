@@ -1,5 +1,5 @@
 # Ethos
-
+[Ethos Logo](ethos_logo.png)
 **A language that speaks for itself.**
 
 Ethos transpiles English-like syntax to Python. Every statement ends with a period. No brackets, no semicolons.
