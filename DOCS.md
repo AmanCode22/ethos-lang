@@ -365,7 +365,7 @@ Compiled C/C++/Rust binaries loaded via ctypes.
 ```
 ~/.ethos/traits/hard_traits/<trait-name>/
 ├── manifest.json
-└── <binary>.so
+└── (compiled binary here)
 ```
 
 ### manifest.json
@@ -373,7 +373,6 @@ Compiled C/C++/Rust binaries loaded via ctypes.
 ```json
 {
   "name": "mymath",
-  "binary": "mymath.so",
   "functions": {
     "add_ints": {
       "return": "int",
