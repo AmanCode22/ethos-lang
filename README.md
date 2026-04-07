@@ -64,8 +64,6 @@ ethos-lang/
 
 ## What's Next
 
-- [ ] Android via Termux
-- [ ] Hard Trait SDK for C/C++/Rust
 - [ ] Rust rewrite of the transpiler (planned for performance + memory safety)
 
 Not planning right now: LSP, VSCode extensions, GUI IDE.
