@@ -63,7 +63,7 @@ ethos-lang/
 ```
 
 ## What's Next
-
+- [ ] Android Support via termux
 - [ ] Rust rewrite of the transpiler (planned for performance + memory safety)
 
 Not planning right now: LSP, VSCode extensions, GUI IDE.
