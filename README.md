@@ -38,7 +38,14 @@ Download the installer from [releases](https://github.com/AmanCode22/ethos-lang/
 See [LINUX_INSTALL.md](LINUX_INSTALL.md) for distro-specific instructions.
 
 ### Android via Termux
-Nuitka builds on termux are not supported due to restrictions and linker issue so ethos in termux requires python and is just a wrapper to run python source code compressed using zipapp. After rust rewrite the termux prebuilt binaries would be provided till then .deb file and termux pkg integration is just done
+Nuitka builds on termux are not supported due to restrictions and linker issue so ethos in termux requires python and is just a wrapper to run python source code compressed using zipapp. After rust rewrite the termux prebuilt binaries would be provided till then .deb file and termux pkg integration is just done. Supported after v0.5.0 beta.
+
+Run after downloading the deb file manually or using wget or curl
+```bash
+pkg update && pkg upgrade
+pkg install python
+pkg install ./termux-deb-path-here-which-you-downloaded.deb
+```
 
 ## Core Features
 
