@@ -2,6 +2,7 @@ import ctypes
 import json
 import os
 import sys
+from functools import wraps
 from pathlib import Path
 
 ctypes_map = {
@@ -33,11 +34,31 @@ ctypes_map = {
     "void": None,
 }
 
+_BYTES_TYPES = {ctypes.c_char_p, ctypes.c_char}
+
 traits_path = Path.home() / ".ethos" / "traits"
 if not traits_path.exists():
     traits_path.mkdir(parents=True, exist_ok=True)
 hard_traits_path = traits_path / "hard_traits"
 hard_traits_path.mkdir(parents=True, exist_ok=True)
+
+
+def _make_smart_wrapper(c_func, argtypes):
+    @wraps(c_func)
+    def wrapper(*args):
+        coerced = []
+        for arg, atype in zip(args, argtypes):
+            if atype in _BYTES_TYPES and isinstance(arg, str):
+                arg = arg.encode("utf-8")
+            elif atype == ctypes.c_wchar_p and isinstance(arg, bytes):
+                arg = arg.decode("utf-8")
+            coerced.append(arg)
+        result = c_func(*coerced)
+        if isinstance(result, bytes):
+            return result.decode("utf-8")
+        return result
+
+    return wrapper
 
 
 def create_environment():
@@ -76,16 +97,17 @@ def create_environment():
             func_data = manifest["functions"][j]
             c_func = getattr(binary, j)
             try:
-                c_func.restype = ctypes_map[func_data["return"]]
-                c_func.argtypes = [ctypes_map[arg] for arg in func_data["args"]]
+                restype = ctypes_map[func_data["return"]]
+                argtypes = [ctypes_map[arg] for arg in func_data["args"]]
+                c_func.restype = restype
+                c_func.argtypes = argtypes
             except KeyError:
                 print(
                     f"Warning: In trait {i}, function {j} has incorrectly written types in manifest.json. Skipping..."
                 )
                 continue
-
+            setattr(binary, j, _make_smart_wrapper(c_func, argtypes))
         env[i] = binary
-
     return env
 
 
