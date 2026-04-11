@@ -359,6 +359,7 @@ Transpiles to `score = int(float("95.5"))`.
 ## 6. Hard Trait Format
 
 Compiled C/C++/Rust binaries loaded via ctypes.
+**Ethos auto loads all hard traits installed on runtime.**
 
 ### Directory Layout
 
