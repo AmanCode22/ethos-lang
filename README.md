@@ -39,14 +39,21 @@ See [LINUX_INSTALL.md](LINUX_INSTALL.md) for distro-specific instructions.
 
 ### Android via Termux
 Nuitka builds on termux are not supported due to restrictions and linker issue so ethos in termux requires python and is just a wrapper to run python source code compressed using zipapp. After rust rewrite the termux prebuilt binaries would be provided till then .deb file and termux pkg integration is just done. Supported after v0.5.0 beta.
-
+You can also add repo of ethos in termux.
+#### By downlaoading debs
 Run after downloading the deb file manually or using wget or curl
 ```bash
 pkg update && pkg upgrade
 pkg install python
 pkg install ./termux-deb-path-here-which-you-downloaded.deb
 ```
-
+#### By adding repo
+Run
+```
+echo "deb [trusted=yes] file:///home/aman/Documents/ethos-termux-repo/repo termux extras" >> $PREFIX/etc/apt/sources.list.d/ethos-local.list
+pkg update
+pkg install ethos-lang-termux ethos-forge-termux
+```
 ## Core Features
 
 - **English syntax** - `if`, `while`, `repeat`, `count` loops all read like sentences
@@ -95,3 +102,4 @@ Open an issue before starting large features to avoid duplicate work.
 ## Related
 
 - **Forge** (package manager): [github.com/AmanCode22/forge](https://github.com/AmanCode22/forge)
+- **Ethos Foundry** (Collection of hard traits): [github.com/amancode22/ethos-foundry](https://github.com/amancode22/ethos-foundry)
