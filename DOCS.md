@@ -432,9 +432,13 @@ Unrecognized types skip that function with a warning.
 
 | Language | Status |
 |----------|--------|
-| C / C++ | Official SDK — in development |
-| Rust | Official SDK — in development |
+| C | [https://github.com/AmanCode22/ethos-trait-c-template](https://github.com/AmanCode22/ethos-trait-c-template) |
+| C++ | [https://github.com/AmanCode22/ethos-trait-cpp-template](https://github.com/AmanCode22/ethos-trait-cpp-template) |
+| Rust | [https://github.com/AmanCode22/ethos-trait-rust-template](https://github.com/AmanCode22/ethos-trait-rust-template) |
 | Other | Community PRs welcome |
+
+### Ethos foundry
+Ethos foundry is a collection of community hard traits pre hosted on github pages and cloudfare pages, see more at : [https://github.com/AmanCode22/ethos-foundry](https://github.com/AmanCode22/ethos-foundry)
 
 ### Loading Process
 
