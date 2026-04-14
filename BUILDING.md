@@ -146,7 +146,7 @@ Darling is for running/testing only — build on real macOS for production binar
 
 ## Android (Termux)
 
-Coming soon.
+Just zipapps due to linker issue so no build required
 
 ---
 
