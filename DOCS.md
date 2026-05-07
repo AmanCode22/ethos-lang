@@ -430,7 +430,7 @@ Compiled C/C++/Rust binaries loaded via ctypes.
 | manifest string | C type | Rust Type(core:ffi) |
 |-----------------|--------|-----------------|
 | `char` | `char` | `c_char` |
-| `unsigned char` | `unsigned char` | 
+| `unsigned char` | `unsigned char` |  `c_uchar` |
 | `wchar_t` | `wchar_t` | `c_wchar` |
 | `short` | `short` | `c_wchar` |
 | `unsigned short` | `unsigned short` | `c_ushort` |
