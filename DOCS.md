@@ -457,6 +457,7 @@ Compiled C/C++/Rust binaries loaded via ctypes.
 | `void` | (no return) | `()` |
 
 For rust, core:cffi must be used for better compatibility.
+When using raw pointers in function , use pub unsafe extern instead of pub extern.
 
 Unrecognized types skip that function with a warning.
 
