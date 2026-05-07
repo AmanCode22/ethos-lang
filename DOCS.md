@@ -396,7 +396,7 @@ Compiled C/C++/Rust binaries loaded via ctypes.
 | `functions.<n>.args` | yes | List of argument types |
 
 ### Supported Types
-
+#### C/C++
 | manifest string | C type |
 |-----------------|--------|
 | `char` | `char` |
@@ -425,6 +425,38 @@ Compiled C/C++/Rust binaries loaded via ctypes.
 | `ssize_t` | `ssize_t` |
 | `bool` | `bool` |
 | `void` | (no return) |
+
+#### Rust
+| manifest string | C type | Rust Type(core:ffi) |
+|-----------------|--------|-----------------|
+| `char` | `char` | `c_char` |
+| `unsigned char` | `unsigned char` | 
+| `wchar_t` | `wchar_t` | `c_wchar` |
+| `short` | `short` | `c_wchar` |
+| `unsigned short` | `unsigned short` | `c_ushort` |
+| `int` | `int` | `c_int` |
+| `unsigned int` | `unsigned int` | `c_uint` |
+| `long` | `long` | `c_long` |
+| `unsigned long` | `unsigned long` |`c_ulong` |
+| `long long` | `long long` | `c_longlong` |
+| `unsigned long long` | `unsigned long long` | `c_ulonglong` |
+| `int8_t` | `int8_t` | `i8` |
+| `uint8_t` | `uint8_t` | `u8` |
+| `int16_t` | `int16_t` | `i16` |
+| `uint16_t` | `uint16_t` | `u16` |
+| `float` | `float` | `c_float` | `c_float` |
+| `double` | `double` | `c_double` | `c_double` |
+| `long double` | `long double` | `c_double` (platform dependent can vary, experimental) |
+| `char *` | `char *` | `*mut c_char` |
+| `wchar_t *` | `wchar_t *` | `*mut c_wchar` |
+| `void *` | `void *` | `*mut c_void` |
+| `pointer_to_int` | `int *` |  `*mut c_int` |
+| `size_t` | `size_t` | `usize` |
+| `ssize_t` | `ssize_t` | `isize` |
+| `bool` | `bool` |  `bool` |
+| `void` | (no return) | `()` |
+
+For rust, core:cffi must be used for better compatibility.
 
 Unrecognized types skip that function with a warning.
 
