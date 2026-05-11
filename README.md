@@ -5,7 +5,11 @@
 
 Ethos transpiles English-like syntax to Python. Every statement ends with a period. No brackets, no semicolons.
 
-I built this solo. Class 9 student from India. Every line of code is mine.
+I built this solo. Class 9 student from India.
+
+## Rust Rewrite in progress
+Ethos is currently being rewritten in rust by me, you can track it's status in brnach rust-rewrite. I would try my best to make it as similar to the python version as I can.
+
 
 ## Quick Example
 
