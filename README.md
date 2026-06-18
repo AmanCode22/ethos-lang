@@ -1,3 +1,9 @@
+# Project Stopped
+Due to lack of testers I am halting developement of Ethos and all it's components, if I would get testers I would restart the developement and would start rust rewrite.
+If you want to test then send me reddit dm to username AmanCode22.
+Testers who can test current version and can help me finding bugs and issues in my code by testing it. I need some begineers who are starting proggraming to try out Ethos and need their reviews.
+
+
 # Ethos
 <img src="ethos_logo.png" alt="Ethos Logo" width="500">
 
@@ -7,8 +13,8 @@ Ethos transpiles English-like syntax to Python. Every statement ends with a peri
 
 I built this solo. Class 9 student from India.
 
-## Rust Rewrite in progress
-Ethos is currently being rewritten in rust by me, you can track it's status in brnach rust-rewrite. I would try my best to make it as similar to the python version as I can.
+## Rust Rewrite in progress stopped
+Ethos was started being rewritten in rust but due to lack of testers I am stopping it also.
 
 
 ## Quick Example
