@@ -1,0 +1,2536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ethos — A language that speaks for itself</title>
+<meta name="description" content="Ethos: a conversational, English-like programming language that transpiles to Python. Built by AmanCode22. Docs, playground, Forge, Foundry." />
+<style>
+
+:root {
+  --bg:           #ffffff;
+  --bg-soft:      #f8fafc;
+  --bg-tint:      #eff6ff;
+  --bg-card:      #ffffff;
+  --bg-code:      #f8fafc;
+  --bg-code-hdr:  #f1f5f9;
+
+  --fg:           #0f172a;
+  --fg-dim:       #475569;
+  --fg-muted:     #94a3b8;
+
+  --primary:      #2563eb;
+  --primary-dk:   #1d4ed8;
+  --primary-soft: #dbeafe;
+  --primary-tint: #eff6ff;
+  --accent:       #06b6d4;
+  --accent-soft:  #cffafe;
+
+  --success:      #16a34a;
+  --success-soft: #dcfce7;
+  --warning:      #d97706;
+  --warning-soft: #fef3c7;
+  --danger:       #dc2626;
+  --danger-soft:  #fee2e2;
+  --purple:       #7c3aed;
+  --purple-soft:  #ede9fe;
+
+  --border:       #e2e8f0;
+  --border-soft:  #f1f5f9;
+
+  --shadow-sm:    0 1px 2px rgba(15,23,42,.05);
+  --shadow:       0 4px 14px rgba(15,23,42,.08);
+  --shadow-lg:    0 18px 40px rgba(15,23,42,.12);
+  --shadow-blue:  0 8px 24px rgba(37,99,235,.18);
+
+  --radius:       12px;
+  --radius-sm:    8px;
+  --radius-lg:    18px;
+
+  --sidebar-w:    264px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.65;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.mono, code, pre, kbd {
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas,
+               "Liberation Mono", monospace;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.topbar {
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary-tint) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 28px;
+  display: flex; align-items: center; gap: 18px;
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+.topbar .brand {
+  display: flex; align-items: center; gap: 12px;
+  font-weight: 800; font-size: 19px; letter-spacing: -.4px;
+  color: var(--fg);
+}
+.topbar .brand:hover { text-decoration: none; }
+.topbar .brand .logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; display: grid; place-items: center;
+  font-weight: 900; font-size: 19px;
+  box-shadow: var(--shadow-blue);
+}
+.topbar .brand .logo-img {
+  width: 34px; height: 34px; border-radius: 8px;
+  object-fit: contain; display: block;
+  box-shadow: 0 2px 6px rgba(37,99,235,.20);
+  background: #fff;
+}
+.topbar .brand .wordmark {
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.topbar .tagline {
+  color: var(--fg-dim); font-size: 13.5px; font-weight: 500;
+  padding-left: 18px; border-left: 1px solid var(--border);
+}
+.topbar .spacer { flex: 1; }
+.topbar .top-links { display: flex; gap: 8px; align-items: center; }
+.topbar .top-links a {
+  color: var(--fg-dim); font-size: 13.5px; font-weight: 500;
+  padding: 7px 12px; border-radius: 8px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.topbar .top-links a:hover {
+  color: var(--primary); background: var(--primary-tint); text-decoration: none;
+}
+.topbar .top-links a.cta {
+  background: var(--primary); color: #fff;
+  box-shadow: var(--shadow-blue);
+}
+.topbar .top-links a.cta:hover { background: var(--primary-dk); color: #fff; }
+.topbar .burger {
+  display: none; background: none; border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--fg);
+}
+
+@media (max-width: 900px) {
+  .topbar { padding: 12px 16px; gap: 12px; }
+  .topbar .tagline { display: none; }
+  .topbar .top-links a:not(.cta) { display: none; }
+  .topbar .burger { display: block; }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  max-width: 1440px; margin: 0 auto;
+  min-height: calc(100vh - 70px);
+}
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--bg-soft);
+  padding: 24px 16px 40px;
+  position: sticky; top: 70px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed; top: 70px; left: 0; bottom: 0;
+    width: 280px; z-index: 40;
+    transform: translateX(-100%); transition: transform .25s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 70px 0 0 0;
+    background: rgba(15,23,42,.4); z-index: 35;
+  }
+  .sidebar-backdrop.show { display: block; }
+}
+.sidebar .group { margin-bottom: 22px; }
+.sidebar .group h5 {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--fg-muted); margin: 0 0 8px; padding: 0 12px;
+  font-weight: 700;
+}
+.sidebar button.nav-btn {
+  width: 100%; text-align: left;
+  background: transparent; border: none;
+  color: var(--fg-dim); font-family: inherit; font-size: 14px;
+  font-weight: 500; padding: 8px 12px; border-radius: 8px;
+  cursor: pointer; transition: all .12s;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 2px;
+}
+.sidebar button.nav-btn:hover {
+  background: var(--primary-tint); color: var(--primary);
+}
+.sidebar button.nav-btn.active {
+  background: var(--primary); color: #fff;
+  box-shadow: var(--shadow-blue);
+}
+.sidebar button.nav-btn .ic {
+  width: 18px; height: 18px; display: grid; place-items: center;
+  font-size: 14px; opacity: .8;
+}
+.sidebar button.nav-btn.active .ic { opacity: 1; }
+
+.sidebar .status {
+  margin: 18px 12px 0; padding: 12px;
+  background: var(--warning-soft);
+  border: 1px solid #fde68a; border-radius: var(--radius-sm);
+  font-size: 12.5px; color: #92400e;
+}
+.sidebar .status strong { color: var(--warning); }
+
+.content { padding: 36px 48px 80px; min-width: 0; }
+@media (max-width: 900px) { .content { padding: 24px 18px 60px; } }
+
+.section { display: none; animation: fadein .25s ease; }
+.section.active { display: block; }
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.section-head {
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 18px;
+}
+.section-head .eyebrow {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--primary); font-weight: 700; margin-bottom: 6px;
+}
+.section-head h1 {
+  font-size: 34px; line-height: 1.15; letter-spacing: -.7px;
+  margin: 0 0 8px; font-weight: 800;
+}
+.section-head .subtitle {
+  color: var(--fg-dim); font-size: 16px; max-width: 720px; margin: 0;
+}
+h2.block {
+  font-size: 22px; margin: 36px 0 14px; font-weight: 700;
+  color: var(--fg); letter-spacing: -.3px;
+  padding-bottom: 6px; border-bottom: 2px solid var(--primary-soft);
+}
+h3 { font-size: 17.5px; margin: 26px 0 10px; color: var(--primary-dk); font-weight: 700; }
+h4 { font-size: 15px; margin: 18px 0 8px; color: var(--fg); font-weight: 700; }
+p { margin: 10px 0; }
+ul, ol { padding-left: 22px; }
+li { margin: 5px 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+pre {
+  background: var(--bg-code); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 18px; overflow-x: auto;
+  font-size: 13px; line-height: 1.65; color: var(--fg);
+  margin: 14px 0;
+}
+pre .kw  { color: #2563eb; font-weight: 600; }
+pre .fn  { color: #7c3aed; }
+pre .str { color: #16a34a; }
+pre .num { color: #d97706; }
+pre .com { color: #64748b; font-style: italic; }
+pre .op  { color: #dc2626; }
+pre .typ { color: #0891b2; }
+
+:not(pre) > code {
+  background: var(--primary-soft); color: var(--primary-dk);
+  padding: 2px 7px; border-radius: 5px; font-size: 12.5px;
+  font-weight: 600;
+}
+.code-caption {
+  font-size: 12px; color: var(--fg-muted);
+  margin: -6px 0 12px; padding-left: 6px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  margin: 16px 0; box-shadow: var(--shadow-sm);
+}
+.card h3, .card h4 { margin-top: 0; }
+.card.info    { border-left: 4px solid var(--primary);  background: linear-gradient(90deg, var(--primary-tint), #fff 60%); }
+.card.success { border-left: 4px solid var(--success);  background: linear-gradient(90deg, var(--success-soft), #fff 60%); }
+.card.warn    { border-left: 4px solid var(--warning);  background: linear-gradient(90deg, var(--warning-soft), #fff 60%); }
+.card.danger  { border-left: 4px solid var(--danger);   background: linear-gradient(90deg, var(--danger-soft),  #fff 60%); }
+.card.purple  { border-left: 4px solid var(--purple);   background: linear-gradient(90deg, var(--purple-soft),  #fff 60%); }
+
+.feature-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  margin: 20px 0;
+}
+@media (max-width: 1000px) { .feature-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px)  { .feature-grid { grid-template-columns: 1fr; } }
+.feature {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.feature:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+.feature .icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--primary-soft); color: var(--primary);
+  display: grid; place-items: center; font-size: 18px;
+  margin-bottom: 10px;
+}
+.feature h4 { margin: 0 0 6px; font-size: 14.5px; color: var(--fg); }
+.feature p { margin: 0; font-size: 13px; color: var(--fg-dim); }
+
+table {
+  width: 100%; border-collapse: collapse; margin: 14px 0;
+  font-size: 13.5px; background: #fff;
+  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+}
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+th { background: var(--bg-soft); color: var(--primary-dk); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--primary-tint); }
+td code, th code { font-size: 12px; }
+
+.badge {
+  display: inline-block; padding: 2px 9px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; letter-spacing: .3px;
+  font-family: "JetBrains Mono", monospace; text-transform: uppercase;
+  vertical-align: middle;
+}
+.badge.req { background: var(--danger-soft);  color: var(--danger);  border: 1px solid #fecaca; }
+.badge.opt { background: var(--success-soft); color: var(--success); border: 1px solid #bbf7d0; }
+.badge.tpl { background: var(--primary-soft); color: var(--primary-dk); border: 1px solid #bfdbfe; }
+.badge.new { background: var(--warning-soft); color: var(--warning); border: 1px solid #fde68a; }
+
+.pill {
+  display: inline-block; background: var(--primary-soft); color: var(--primary-dk);
+  padding: 3px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+  margin: 0 4px 4px 0;
+}
+
+.btn {
+  appearance: none; cursor: pointer; font-family: inherit;
+  background: #fff; color: var(--fg);
+  border: 1px solid var(--border); padding: 9px 16px;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { background: var(--primary-tint); border-color: var(--primary); color: var(--primary); text-decoration: none; }
+.btn.primary {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+  box-shadow: var(--shadow-blue);
+}
+.btn.primary:hover { background: var(--primary-dk); color: #fff; border-color: var(--primary-dk); }
+.btn.ghost { background: transparent; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn.sm { padding: 5px 11px; font-size: 12.5px; }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; color: var(--fg-dim);
+  border: 1px solid var(--border); padding: 6px 12px;
+  border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  margin-bottom: 18px; transition: all .15s;
+  text-decoration: none;
+}
+.back-btn:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-tint); text-decoration: none; }
+.back-btn svg { width: 14px; height: 14px; }
+
+.platform-icon {
+  width: 28px; height: 28px; display: block; margin-bottom: 6px;
+  color: var(--primary);
+}
+.card-logo-img {
+  width: 22px; height: 22px; border-radius: 4px; object-fit: contain;
+  vertical-align: middle;
+}
+
+.checklist-card { padding: 18px 22px; }
+ul.checklist { list-style: none; padding-left: 0 !important; margin: 0; }
+ul.checklist li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; border-bottom: 1px dashed var(--border-soft);
+  margin: 0;
+}
+ul.checklist li:last-child { border-bottom: none; }
+ul.checklist input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 18px; height: 18px; flex-shrink: 0;
+  margin: 2px 0 0; cursor: default;
+  border: 2px solid var(--success); border-radius: 4px;
+  background: #fff; position: relative;
+  transition: background .15s;
+}
+ul.checklist input[type="checkbox"]:hover { background: var(--success-soft); }
+ul.checklist input[type="checkbox"]:checked {
+  background: var(--success); border-color: var(--success);
+}
+ul.checklist input[type="checkbox"]:checked::after {
+  content: ''; position: absolute; left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid #fff; border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+ul.checklist li span { flex: 1; line-height: 1.55; }
+ul.checklist li code { font-size: 12.5px; }
+
+.hero {
+  background: linear-gradient(135deg, var(--primary-tint) 0%, #fff 70%);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 40px 36px; margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(37,99,235,.10) 0, transparent 38%),
+    radial-gradient(circle at 88% 8%, rgba(6,182,212,.10) 0, transparent 35%);
+  pointer-events: none;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero h1 {
+  font-size: 42px; line-height: 1.1; letter-spacing: -1.2px;
+  margin: 0 0 12px; font-weight: 800;
+}
+.hero h1 .grad {
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero .lede {
+  font-size: 17px; color: var(--fg-dim); margin: 0 0 22; max-width: 620px;
+}
+.hero .lede strong { color: var(--fg); }
+.hero .cta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.hero .meta-row {
+  margin-top: 22px; display: flex; gap: 18px; flex-wrap: wrap;
+  color: var(--fg-muted); font-size: 13px;
+}
+.hero .meta-row span { display: inline-flex; align-items: center; gap: 6px; }
+.hero .meta-row a { color: var(--primary); font-weight: 600; }
+
+.status-banner {
+  background: linear-gradient(90deg, var(--warning-soft), #fff 70%);
+  border: 1px solid #fde68a; border-left: 4px solid var(--warning);
+  border-radius: var(--radius); padding: 14px 18px; margin: 18px 0;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.status-banner .ic {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--warning); color: #fff;
+  display: grid; place-items: center; font-size: 16px; flex-shrink: 0;
+}
+.status-banner strong { color: #92400e; }
+.status-banner p { margin: 4px 0 0; color: #78350f; font-size: 14px; }
+
+.install-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin: 18px 0;
+}
+@media (max-width: 1000px) { .install-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px)  { .install-grid { grid-template-columns: 1fr; } }
+.install-card {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; transition: all .15s;
+}
+.install-card:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.install-card h4 { margin: 0 0 8px; font-size: 14px; color: var(--primary-dk); display: flex; align-items: center; gap: 6px; }
+.install-card .cmd {
+  background: var(--bg-code); border: 1px solid var(--border-soft);
+  border-radius: 6px; padding: 8px 10px;
+  font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+  color: var(--fg-dim); overflow-x: auto; margin-top: 8px;
+}
+.install-card p { font-size: 12.5px; color: var(--fg-dim); margin: 0; }
+
+.steps { counter-reset: step; margin: 18px 0; padding: 0; list-style: none; }
+.steps li {
+  counter-increment: step; position: relative;
+  padding: 14px 16px 14px 56px; margin: 0 0 10px;
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.steps li::before {
+  content: counter(step); position: absolute; left: 16px; top: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  display: grid; place-items: center; font-weight: 800; font-size: 13px;
+  box-shadow: var(--shadow-blue);
+}
+.steps li strong { color: var(--fg); }
+
+.pg-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 1100px) { .pg-layout { grid-template-columns: 1fr; } }
+.pg-panel { display: flex; flex-direction: column; min-height: 460px; }
+.pg-panel > header {
+  background: var(--bg-code-hdr); border: 1px solid var(--border);
+  border-bottom: none; border-radius: 10px 10px 0 0;
+  padding: 8px 14px; font-size: 12.5px; color: var(--fg-dim);
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: "JetBrains Mono", monospace; font-weight: 600;
+}
+.pg-panel > header .dot { color: var(--success); }
+.pg-body {
+  flex: 1; border: 1px solid var(--border); border-radius: 0 0 10px 10px;
+  background: var(--bg-code); overflow: auto;
+}
+#editor {
+  min-height: 420px; padding: 14px 16px;
+  outline: none; white-space: pre; overflow: auto;
+  background: #fff; font-family: "JetBrains Mono", monospace;
+  font-size: 13.5px; line-height: 1.7; color: var(--fg);
+}
+#editor:focus { box-shadow: inset 0 0 0 2px var(--primary-soft); }
+.pg-body pre { border: none; border-radius: 0; margin: 0; min-height: 420px; background: var(--bg-code); }
+.pg-toolbar {
+  display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0;
+  align-items: center;
+}
+.pg-status {
+  margin-left: auto; font-size: 12.5px; color: var(--fg-muted);
+  font-family: "JetBrains Mono", monospace; font-weight: 600;
+}
+.pg-status.ready   { color: var(--success); }
+.pg-status.loading { color: var(--warning); }
+.pg-status.error   { color: var(--danger); }
+
+.examples-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 4px; }
+.examples-row .chip {
+  background: #fff; border: 1px solid var(--border);
+  color: var(--fg-dim); font-size: 12px; padding: 4px 11px;
+  border-radius: 999px; cursor: pointer; transition: all .15s;
+  font-family: "JetBrains Mono", monospace; font-weight: 600;
+}
+.examples-row .chip:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-tint); }
+
+.out-mode-bar {
+  display: flex; gap: 4px; padding: 6px 8px;
+  background: var(--bg-code-hdr); border-bottom: 1px solid var(--border);
+}
+.out-mode-bar button {
+  appearance: none; background: transparent; border: none;
+  font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+  color: var(--fg-dim); padding: 4px 10px; border-radius: 6px;
+  cursor: pointer; font-weight: 600;
+}
+.out-mode-bar button:hover { background: var(--primary-tint); color: var(--primary); }
+.out-mode-bar button.active { background: var(--primary); color: #fff; }
+
+.kbd {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-bottom-width: 2px; padding: 1px 6px; border-radius: 4px;
+  font-size: 12px; font-family: "JetBrains Mono", monospace; color: var(--fg-dim);
+}
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: #fff; border: 1px solid var(--border);
+  color: var(--fg); padding: 12px 16px; border-radius: 10px;
+  box-shadow: var(--shadow-lg); z-index: 100;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .2s, transform .2s;
+  max-width: 340px; font-size: 13px;
+  border-left: 3px solid var(--primary);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+
+.inline-note {
+  display: inline-block; padding: 1px 8px; border-radius: 4px;
+  background: var(--accent-soft); color: #0e7490;
+  font-size: 11.5px; font-weight: 600;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.foot {
+  margin-top: 60px; padding-top: 22px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  color: var(--fg-muted); font-size: 12.5px;
+}
+.foot a { color: var(--fg-dim); }
+.foot a:hover { color: var(--primary); }
+
+.anchor-link {
+  opacity: 0; margin-left: 6px; color: var(--primary); font-size: 14px;
+  text-decoration: none;
+}
+h3:hover .anchor-link, h2.block:hover .anchor-link { opacity: 1; }
+
+.sidebar-backdrop { display: none; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="burger" id="burger" aria-label="Menu">&#9776;</button>
+  <a href="#" class="brand" data-sec="overview">
+    <img src="https://raw.githubusercontent.com/AmanCode22/ethos-lang/main/ethos_logo.png" alt="Ethos" class="logo-img" />
+    <span class="wordmark">Ethos</span>
+  </a>
+  <span class="tagline">A language that speaks for itself &mdash; English-like syntax &rarr; Python</span>
+  <span class="spacer"></span>
+  <div class="top-links">
+    <a href="https://github.com/AmanCode22/ethos-lang" target="_blank" rel="noopener">ethos-lang</a>
+    <a href="https://github.com/AmanCode22/forge" target="_blank" rel="noopener">forge</a>
+    <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener">foundry</a>
+    <a href="https://github.com/AmanCode22" target="_blank" rel="noopener" class="cta">GitHub &nearr;</a>
+  </div>
+</header>
+
+<div class="sidebar-backdrop" id="backdrop"></div>
+
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="group">
+      <h5>Getting Started</h5>
+      <button class="nav-btn active" data-sec="overview"><span class="ic">◎</span> Overview</button>
+      <button class="nav-btn" data-sec="install"><span class="ic">↓</span> Install</button>
+      <button class="nav-btn" data-sec="examples"><span class="ic">✦</span> Examples</button>
+    </div>
+    <div class="group">
+      <h5>Language</h5>
+      <button class="nav-btn" data-sec="language"><span class="ic">{ }</span> Reference</button>
+      <button class="nav-btn" data-sec="playground"><span class="ic">▶</span> Playground</button>
+    </div>
+    <div class="group">
+      <h5>Ecosystem</h5>
+      <button class="nav-btn" data-sec="traits"><span class="ic">◆</span> Traits</button>
+      <button class="nav-btn" data-sec="forge"><span class="ic">⚙</span> Forge</button>
+      <button class="nav-btn" data-sec="foundry"><span class="ic">⬡</span> Foundry</button>
+    </div>
+    <div class="group">
+      <h5>Project</h5>
+      <button class="nav-btn" data-sec="changelog"><span class="ic">⌚</span> Changelog</button>
+      <button class="nav-btn" data-sec="contributing"><span class="ic">✎</span> Contributing</button>
+    </div>
+    <div class="status">
+      <strong>Status:</strong> Development paused &mdash; needs testers. <a href="#" data-sec="contributing" style="color:#92400e;text-decoration:underline">How to help &nearr;</a>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <section id="overview" class="section active">
+      <div class="hero">
+        <h1><img src="https://raw.githubusercontent.com/AmanCode22/ethos-lang/main/ethos_logo.png" alt="Ethos" style="width:56px;height:56px;vertical-align:middle;margin-right:14px;border-radius:12px;box-shadow:var(--shadow-blue)" />Ethos &mdash; <span class="grad">a language that speaks for itself.</span></h1>
+        <p class="lede">
+          Ethos transpiles <strong>English-like syntax</strong> to Python. Every statement ends with a
+          period. No brackets, no semicolons &mdash; just sentences. Built solo by Aman, a Class 9 student
+          from India. The compiler, Forge, Foundry, every official template, and the three sample traits
+          (<code>greetc</code>, <code>greetcpp</code>, <code>greetr</code>) are all part of the same project.
+        </p>
+        <div class="cta-row">
+          <a href="#" class="btn primary" data-sec="install">Install Ethos &darr;</a>
+          <a href="#" class="btn" data-sec="playground">Try the playground ▶</a>
+          <a href="#" class="btn" data-sec="changelog">Read the changelog ⌚</a>
+          <a href="https://github.com/AmanCode22/ethos-lang" target="_blank" rel="noopener" class="btn ghost">View source ↗</a>
+        </div>
+        <div class="meta-row">
+          <span>⭑ <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">Full language reference</a></span>
+          <span>⚙ <a href="https://github.com/AmanCode22/forge" target="_blank" rel="noopener">Forge package manager</a></span>
+          <span>⬡ <a href="#" data-sec="foundry">Foundry trait registry</a></span>
+          <span>⌚ <a href="#" data-sec="changelog">Releases &amp; changelog</a></span>
+        </div>
+      </div>
+
+      <div class="status-banner">
+        <div class="ic">!</div>
+        <div>
+          <strong>Project status &mdash; paused, seeking testers.</strong>
+          <p>
+            Development of Ethos and all its components is paused due to a lack of testers. The Rust
+            rewrite is paused too. If you can test the current version and report bugs &mdash; especially
+            if you're a beginner starting programming &mdash; please send a Reddit DM to
+            <a href="https://www.reddit.com/user/AmanCode22" target="_blank" rel="noopener"><strong>u/AmanCode22</strong></a>.
+            With enough testers, development and the Rust rewrite will restart.
+          </p>
+        </div>
+      </div>
+
+      <h2 class="block">Quick example</h2>
+      <p>This is real Ethos &mdash; paste it into the <a href="#" data-sec="playground">Playground</a> tab to run it in your browser via Pyodide.</p>
+<pre><span class="kw">ask</span> <span class="str">"What's your name? "</span> <span class="kw">into</span> name.
+<span class="kw">set</span> greeting <span class="kw">to</span> <span class="str">"Hello, "</span>.
+<span class="kw">say</span> greeting.
+<span class="kw">say</span> name.
+
+<span class="kw">set</span> score <span class="kw">to</span> <span class="num">95</span>.
+<span class="kw">if</span> score <span class="kw">is above</span> <span class="num">90</span>.
+  <span class="kw">say</span> <span class="str">"That's an A."</span>.
+<span class="kw">otherwise if</span> score <span class="kw">is at least</span> <span class="num">75</span>.
+  <span class="kw">say</span> <span class="str">"That's a B."</span>.
+<span class="kw">otherwise</span>.
+  <span class="kw">say</span> <span class="str">"Keep going."</span>.
+<span class="kw">end</span>.</pre>
+
+      <h2 class="block">Why Ethos</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="icon">✦</div>
+          <h4>English syntax</h4>
+          <p><code>if</code>, <code>while</code>, <code>repeat</code>, <code>count</code> loops all read like sentences. <code>set age to 25.</code> not <code>age = 25;</code>.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">⇄</div>
+          <h4>Type casting</h4>
+          <p>Cast with phrases &mdash; <code>set age to "25" to number.</code>, <code>to text</code>, <code>to list</code>, <code>to decimal</code>, and more.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">⌶</div>
+          <h4>String slicing</h4>
+          <p><code>set piece to text from 0 to 5.</code> transpiles directly to Python slice syntax <code>text[0:5]</code>.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">{ }</div>
+          <h4>Functions</h4>
+          <p>Define with <code>how to greet with name.</code> &hellip; call with <code>run greet with "Aman".</code></p>
+        </div>
+        <div class="feature">
+          <div class="icon">⤵</div>
+          <h4>Imports</h4>
+          <p><code>bring in math.</code> then <code>run math.sqrt with 16.</code> &mdash; the entire Python ecosystem is reachable.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">◆</div>
+          <h4>Hard Traits</h4>
+          <p>Load compiled C, C++, or Rust binaries via <code>ctypes</code> for native-speed extensions.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">◇</div>
+          <h4>Soft Traits</h4>
+          <p>Install any Python package from PyPI into <code>~/.ethos/traits/</code> using Forge.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">⬡</div>
+          <h4>Foundry registry</h4>
+          <p>A curated registry of Hard Traits &mdash; every trait ships binaries for all 8 platforms.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">⚙</div>
+          <h4>Forge</h4>
+          <p>The official package manager &mdash; installs Soft Traits from PyPI and Hard Traits from URLs or Foundry.</p>
+        </div>
+      </div>
+
+      <h2 class="block">The Ethos ecosystem</h2>
+      <p>Ethos is not one repo &mdash; it's a small family of repositories, all maintained under <code>AmanCode22</code>. Each one has a clear role: the compiler, the package manager, the trait registry, the three official templates, and the three verified sample traits. They're designed to compose cleanly.</p>
+      <table>
+        <thead><tr><th>Repository</th><th>Role</th><th>Language</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-lang" target="_blank" rel="noopener"><code>AmanCode22/ethos-lang</code></a></td><td>The Ethos compiler &mdash; lexer, parser (transpiler to Python), runtime, and Hard Trait loader.</td><td>Python (Nuitka-compiled)</td><td><span class="badge new">paused</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/forge" target="_blank" rel="noopener"><code>AmanCode22/forge</code></a></td><td>Package manager for Ethos. Installs Soft Traits (PyPI) and Hard Traits (binaries).</td><td>Python</td><td><span class="badge new">paused</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener"><code>AmanCode22/ethos-foundry</code></a></td><td>Registry of Hard Traits. Hosted on Cloudflare Pages. Every PR must support all 8 platforms.</td><td>JSON registry</td><td><span class="badge new">paused</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-c-template" target="_blank" rel="noopener"><code>ethos-trait-c-template</code></a></td><td>Official template for writing Hard Traits in C. CI auto-builds all 8 platforms.</td><td>C + CMake</td><td><span class="badge tpl">template</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-cpp-template" target="_blank" rel="noopener"><code>ethos-trait-cpp-template</code></a></td><td>Official template for writing Hard Traits in C++.</td><td>C++ + CMake</td><td><span class="badge tpl">template</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-rust-template" target="_blank" rel="noopener"><code>ethos-trait-rust-template</code></a></td><td>Official template for writing Hard Traits in Rust.</td><td>Rust</td><td><span class="badge tpl">template</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-greetc" target="_blank" rel="noopener"><code>ethos-trait-greetc</code></a></td><td>Sample trait written in C for greet. Verified.</td><td>C</td><td><span class="badge opt">verified</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-greetcpp" target="_blank" rel="noopener"><code>ethos-trait-greetcpp</code></a></td><td>Sample trait written in C++ for greet. Verified.</td><td>C++</td><td><span class="badge opt">verified</span></td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-greetr" target="_blank" rel="noopener"><code>ethos-trait-greetr</code></a></td><td>Sample trait written in Rust for greet. Verified.</td><td>Rust</td><td><span class="badge opt">verified</span></td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="block">How it works</h2>
+      <p>Ethos is a <strong>transpiler</strong>: it parses English-like source code and emits Python, which is then executed. The pipeline is intentionally simple and inspectable &mdash; you can see exactly what Python your Ethos code becomes using the <code>python.</code> &hellip; <code>pythonend.</code> block, and you can trace tokens with <code>debug.</code> &hellip; <code>debugend.</code>.</p>
+
+      <div class="card info">
+        <h4>Project structure (from the real repo)</h4>
+<pre>ethos-lang/
+├── main.py
+├── requirements.txt
+└── src/ethos/
+    ├── cli.py            <span class="com"># REPL + file runner</span>
+    ├── lexer.py          <span class="com"># Sentence splitter + tokenizer</span>
+    ├── parser.py         <span class="com"># Transpiler (Ethos → Python)</span>
+    ├── executer.py       <span class="com"># Runtime + Hard Trait loader</span>
+    ├── stdlib_shim.py    <span class="com"># Forces stdlib into Nuitka binary</span>
+    └── version.py        <span class="com"># Version string</span></pre>
+      </div>
+
+      <h2 class="block">What's next</h2>
+      <div class="card warn">
+        <h4>Planned &mdash; pending testers</h4>
+        <ul>
+          <li><strong>Rust rewrite</strong> of the transpiler for performance and memory safety. Currently paused.</li>
+          <li><strong>Termux prebuilt binaries</strong> once the Rust rewrite lands. Until then, Termux runs the Python source as a zipapp.</li>
+        </ul>
+        <p style="margin-top:12px"><strong>Not planned right now:</strong> LSP, VSCode extensions, GUI IDE.</p>
+      </div>
+
+      <div class="foot">
+        <span>Built by <a href="https://github.com/AmanCode22" target="_blank" rel="noopener">AmanCode22</a> &mdash; Aman Adlakha, Class 9, India.</span>
+        <span>Docs: <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">DOCS.md</a> · <a href="https://github.com/AmanCode22/ethos-lang/blob/main/BUILDING.md" target="_blank" rel="noopener">BUILDING.md</a> · <a href="https://github.com/AmanCode22/ethos-lang/blob/main/STDLIB_SHIMS.md" target="_blank" rel="noopener">STDLIB_SHIMS.md</a></span>
+      </div>
+    </section>
+
+    <section id="install" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Getting Started</div>
+        <h1>Install Ethos</h1>
+        <p class="subtitle">Ethos ships as a Nuitka-compiled binary on Windows, macOS, and Linux. Forge (the package manager) is bundled in the same installer. On Android you can install via Termux. Every binary on the releases page is built and signed by the maintainer.</p>
+      </div>
+
+      <div class="card info">
+        <h4>One installer, two tools &mdash; by design</h4>
+        <p>I deliberately ship Ethos and Forge together in one installer on Windows and macOS. The recommended path is the <strong>combined installer</strong> from the <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">ethos-lang releases page</a>. It sets up both <code>ethos</code> and <code>forge</code> in one shot and adds them to your <code>PATH</code>. On Linux, installing <code>ethos-forge</code> via your package manager pulls in <code>ethos-lang</code> automatically.</p>
+      </div>
+
+      <h2 class="block">Quick install by platform</h2>
+      <div class="install-grid">
+        <div class="install-card">
+          <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.1L10.4 4v7.3H3V5.1zM10.4 12.7V20L3 18.9v-6.2h7.4zM11.6 3.8L21 2.5v8.8h-9.4V3.8zM21 12.7v8.8l-9.4-1.3v-7.5H21z"/></svg>
+          <h4>Windows</h4>
+          <p>Combined installer for Ethos + Forge.</p>
+          <div class="cmd">↓ ethos-lang/releases &rarr; .exe installer</div>
+        </div>
+        <div class="install-card">
+          <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 12.5c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.4 1-4.3 2.6-1.8 3.2-.5 7.9 1.3 10.5.9 1.3 1.9 2.7 3.3 2.6 1.3-.1 1.8-.9 3.4-.9 1.6 0 2.1.9 3.4.9 1.4 0 2.3-1.3 3.2-2.6 1-1.5 1.4-2.9 1.4-3-.1 0-2.7-1-2.7-4.2zM15.1 4.6c.7-.9 1.2-2.1 1.1-3.3-1 .1-2.2.7-2.9 1.6-.6.8-1.2 2-1.1 3.2 1.1.1 2.2-.6 2.9-1.5z"/></svg>
+          <h4>macOS</h4>
+          <p>Combined <code>.pkg</code> installer for Ethos + Forge.</p>
+          <div class="cmd">↓ ethos-lang/releases &rarr; .pkg</div>
+        </div>
+        <div class="install-card">
+          <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2 0-3.5 2-3.5 4.5 0 1 .3 1.8.3 2.5 0 .8-.4 1.4-1 2.2-1 1.2-2.3 2.7-2.3 5.3 0 2.5 1 4 2.5 5 .5.3 1 .5 1.5.5-.3.3-.5.7-.5 1.2 0 1 .8 1.8 1.8 1.8h.5c.3.3.7.5 1.2.5s.9-.2 1.2-.5h.5c1 0 1.8-.8 1.8-1.8 0-.5-.2-.9-.5-1.2.5 0 1-.2 1.5-.5 1.5-1 2.5-2.5 2.5-5 0-2.6-1.3-4.1-2.3-5.3-.6-.8-1-1.4-1-2.2 0-.7.3-1.5.3-2.5C15.5 4 14 2 12 2zm-1.5 5c.6 0 1 .5 1 1.2s-.4 1.2-1 1.2-1-.5-1-1.2.4-1.2 1-1.2zm3 0c.6 0 1 .5 1 1.2s-.4 1.2-1 1.2-1-.5-1-1.2.4-1.2 1-1.2zM12 11c.8 0 1.5.7 1.5 1.5S12.8 14 12 14s-1.5-.7-1.5-1.5S11.2 11 12 11z"/></svg>
+          <h4>Linux</h4>
+          <p>OBS repo, AUR, or universal tarball.</p>
+          <div class="cmd">OBS &middot; AUR &middot; tar -xzf ethos-build.tar.gz</div>
+        </div>
+        <div class="install-card">
+          <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 10v8c0 .6.4 1 1 1h1v3c0 .6.4 1 1 1s1-.4 1-1v-3h4v3c0 .6.4 1 1 1s1-.4 1-1v-3h1c.6 0 1-.4 1-1v-8H6zm-2 0c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1v-6c0-.6-.4-1-1-1zm16 0c-.6 0-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1v-6c0-.6-.4-1-1-1zM15.6 4.4l1.2-2c.1-.1 0-.3-.1-.4-.1-.1-.3 0-.4.1l-1.3 2.1c-.9-.4-1.9-.6-3-.6s-2.1.2-3 .6L7.7 2.1c-.1-.1-.3-.2-.4-.1-.1.1-.2.3-.1.4l1.2 2C6.3 5.5 5 7.4 5 9.5h14c0-2.1-1.3-4-3.4-5.1zM9 7c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm6 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/></svg>
+          <h4>Termux</h4>
+          <p>Add the Ethos repo and install via <code>pkg</code>.</p>
+          <div class="cmd">pkg install ethos-lang ethos-forge</div>
+        </div>
+      </div>
+
+      <h2 class="block">Windows &amp; macOS</h2>
+      <ol class="steps">
+        <li>Go to the <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">ethos-lang releases page</a>.</li>
+        <li>Download the installer for your OS &mdash; <code>.exe</code> on Windows, <code>.pkg</code> on macOS. The installer includes <strong>both Ethos and Forge</strong>.</li>
+        <li>Run it. Both <code>ethos</code> and <code>forge</code> are added to your <code>PATH</code>.</li>
+        <li>Open a terminal and verify:
+          <pre>ethos --version
+forge --version</pre>
+        </li>
+      </ol>
+      <p>There is also a standalone Forge <code>.exe</code> on the <a href="https://github.com/AmanCode22/forge/releases" target="_blank" rel="noopener">Forge releases page</a> if you only want the package manager.</p>
+
+      <h2 class="block">Linux &mdash; full instructions</h2>
+      <p>Three install paths are available on Linux. All of them install the same Nuitka-compiled binary &mdash; no Python required at runtime.</p>
+
+      <h3>Option 1 &mdash; OBS Repository <span class="badge opt">recommended</span></h3>
+      <p>Automatic updates via your package manager. Add the repo and install from <a href="https://software.opensuse.org/download.html?project=home:AmanCode22&package=ethos-lang" target="_blank" rel="noopener">software.opensuse.org</a>. Packages are published for these distros:</p>
+      <table>
+        <thead><tr><th>Distribution</th><th>Architectures</th></tr></thead>
+        <tbody>
+          <tr><td>openSUSE Leap 15.6</td><td>x86_64</td></tr>
+          <tr><td>Arch Linux</td><td>x86_64</td></tr>
+          <tr><td>Debian 12 / 13 / Unstable</td><td>i586, x86_64</td></tr>
+          <tr><td>Fedora 42 / 43 / Rawhide</td><td>aarch64, x86_64</td></tr>
+          <tr><td>openEuler 24.03</td><td>aarch64, x86_64</td></tr>
+          <tr><td>openSUSE Factory / Tumbleweed / Slowroll</td><td>aarch64, armv7l, i586, x86_64</td></tr>
+          <tr><td>Ubuntu 24.04 / 25.04 / 25.10 / 26.04</td><td>x86_64</td></tr>
+        </tbody>
+      </table>
+      <p>The <code>ethos-lang</code> package recommends <code>ethos-forge</code> (the package manager) as an optional dependency.</p>
+
+      <h3>Option 2 &mdash; AUR (Arch Linux)</h3>
+<pre><span class="com"># Using yay</span>
+yay -S ethos-lang
+
+<span class="com"># Using paru</span>
+paru -S ethos-lang
+
+<span class="com"># Manual AUR build</span>
+git clone https://aur.archlinux.org/ethos-lang.git
+cd ethos-lang
+makepkg -si</pre>
+      <p><code>ethos-forge</code> is available as <code>optdepends</code>.</p>
+
+      <h3>Option 3 &mdash; Universal Tarball <span class="badge opt">any distro</span></h3>
+      <p>Works on any distro. Includes both <code>ethos</code> and <code>forge</code>. Download <code>ethos-build.tar.gz</code> from the <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">releases page</a>, then:</p>
+<pre><span class="com"># Extract</span>
+tar -xzf ethos-build.tar.gz
+cd ethos-build
+
+<span class="com"># Make the installer executable</span>
+chmod +x install.sh
+
+<span class="com"># Install system-wide (needs sudo):</span>
+sudo ./install.sh
+<span class="com"># → installs to /usr/local/bin/</span>
+
+<span class="com"># OR install user-only (no sudo):</span>
+./install.sh
+<span class="com"># → installs to ~/bin/ and updates your .bashrc</span></pre>
+
+      <div class="card info">
+        <h4>Dependency note</h4>
+        <p>Installing <code>ethos-forge</code> via any Linux package manager will pull in <code>ethos-lang</code> automatically as a hard dependency. You don't need to install Ethos first.</p>
+      </div>
+
+      <h2 class="block">Android &mdash; Termux</h2>
+      <p>Nuitka builds on Termux are not supported due to linker restrictions, so on Termux Ethos runs as a wrapper around the Python source code compressed as a zipapp. Prebuilt Termux binaries will ship after the Rust rewrite. Until then, <code>.deb</code> files and <code>pkg</code> integration are available from <strong>v0.5.0 beta</strong> onwards.</p>
+
+      <h3>Option A &mdash; download a <code>.deb</code> manually</h3>
+<pre><span class="com"># After downloading the .deb file with wget or curl:</span>
+pkg update && pkg upgrade
+pkg install python
+pkg install ./path-to-the-deb-file.deb</pre>
+
+      <h3>Option B &mdash; add the Ethos Termux repo (recommended)</h3>
+<pre><span class="com"># 1. Add the repo to your sources list</span>
+mkdir -p $PREFIX/etc/apt/sources.list.d/
+echo <span class="str">"deb [trusted=yes] https://amancode22.github.io/ethos-termux-repo/repo termux extras"</span> \
+  >> $PREFIX/etc/apt/sources.list.d/ethos-repo.list
+
+<span class="com"># 2. Update and install</span>
+pkg update
+pkg install ethos-lang ethos-forge</pre>
+
+      <h2 class="block">What's in a release</h2>
+      <p>Every release I publish on the <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">ethos-lang releases page</a> contains a full set of platform binaries. Each asset ships with a SHA256 checksum so you can verify integrity. The v0.5.0-beta release, for example, contains 11 assets:</p>
+      <table>
+        <thead><tr><th>Asset</th><th>Platform</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>ethos-installer-linux-x86_64.tar.gz</code></td><td>Linux x86_64</td><td>Universal tarball with <code>install.sh</code></td></tr>
+          <tr><td><code>ethos-linux-x86_64</code></td><td>Linux x86_64</td><td>Standalone single binary</td></tr>
+          <tr><td><code>Ethos-macOS-arm64.pkg</code></td><td>macOS Apple Silicon</td><td>Combined Ethos + Forge installer</td></tr>
+          <tr><td><code>Ethos-macOS-x86_64.pkg</code></td><td>macOS Intel</td><td>Combined Ethos + Forge installer</td></tr>
+          <tr><td><code>ethos-macos-arm64</code></td><td>macOS Apple Silicon</td><td>Standalone single binary</td></tr>
+          <tr><td><code>ethos-macos-intel-x86_64</code></td><td>macOS Intel</td><td>Standalone single binary</td></tr>
+          <tr><td><code>Ethos-windows-installer-x86_64.exe</code></td><td>Windows x86_64</td><td>Combined Ethos + Forge installer</td></tr>
+          <tr><td><code>Ethos-windows-installer-arm64.exe</code></td><td>Windows arm64</td><td>Combined Ethos + Forge installer</td></tr>
+          <tr><td><code>ethos-lang_termux_0.5.0-beta_all.deb</code></td><td>Android / Termux</td><td>Termux <code>.deb</code> (zipapp wrapper)</td></tr>
+          <tr><td><code>Source code (zip)</code></td><td>Any</td><td>Source for building from scratch</td></tr>
+          <tr><td><code>Source code (tar.gz)</code></td><td>Any</td><td>Source for building from scratch</td></tr>
+        </tbody>
+      </table>
+      <div class="card info">
+        <h4>Why standalone builds on Windows</h4>
+        <p>From v0.4-beta onwards the Windows build switched from Nuitka onefile to standalone mode. Onefile builds were triggering Windows Defender's trojan-horse heuristics &mdash; the standalone build avoids that false positive and is what ships now.</p>
+      </div>
+
+      <h2 class="block">Build from source</h2>
+      <p>Requires Python 3.10+. The Forge repo has no dependencies beyond the standard library.</p>
+<pre><span class="com"># Clone and run Forge directly</span>
+git clone https://github.com/AmanCode22/forge.git
+cd forge
+python main.py --help
+
+<span class="com"># Clone and build Ethos</span>
+git clone https://github.com/AmanCode22/ethos-lang.git
+cd ethos-lang
+<span class="com"># See BUILDING.md for full build instructions (Nuitka compilation)</span></pre>
+
+      <h2 class="block">Verify your install</h2>
+<pre>$ ethos --version
+$ forge --version
+$ ethos
+<span class="com"># Drops into the Ethos REPL</span>
+&gt; say <span class="str">"Hello, Ethos!"</span>.
+Hello, Ethos!</pre>
+
+      <div class="card success">
+        <h4>Next steps</h4>
+        <ul style="margin: 0">
+          <li>Read the <a href="#" data-sec="language">Language Reference</a> for every statement and operator.</li>
+          <li>Try the <a href="#" data-sec="playground">in-browser Playground</a> &mdash; no install needed.</li>
+          <li>See what changed in each version on the <a href="#" data-sec="changelog">Changelog</a> page.</li>
+          <li>Install your first trait: <a href="#" data-sec="forge"><code>forge pymodule get requests</code></a>.</li>
+        </ul>
+      </div>
+
+      <div class="foot">
+        <span>Install docs source: <a href="https://github.com/AmanCode22/ethos-lang/blob/main/LINUX_INSTALL.md" target="_blank" rel="noopener">LINUX_INSTALL.md</a>, <a href="https://github.com/AmanCode22/forge/blob/main/MACOS_INSTALL.md" target="_blank" rel="noopener">MACOS_INSTALL.md</a></span>
+        <span>Releases: <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">ethos-lang</a> · <a href="https://github.com/AmanCode22/forge/releases" target="_blank" rel="noopener">forge</a></span>
+      </div>
+    </section>
+
+    <section id="language" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Reference</div>
+        <h1>Language Reference</h1>
+        <p class="subtitle">Complete syntax reference, mirroring the official <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">DOCS.md</a>. Every statement ends with a period. Keywords are case-insensitive.</p>
+      </div>
+
+      <h2 class="block">Syntax rules</h2>
+      <ul>
+        <li>Every statement ends with a period (<code>.</code>).</li>
+        <li>Keywords are case-insensitive &mdash; <code>SET</code>, <code>Say</code>, <code>set</code> all work.</li>
+        <li>Strings use <code>"double"</code> or <code>'single'</code> quotes.</li>
+        <li>Indentation is ignored &mdash; the parser tracks blocks via keywords.</li>
+        <li>Blank lines are ignored.</li>
+        <li>Trailing periods on block keywords (<code>end.</code>, <code>otherwise.</code>) are optional.</li>
+      </ul>
+
+      <h2 class="block">Lexer internals</h2>
+      <div class="card info">
+        <h4>Pass 1 &mdash; Sentence splitting</h4>
+        <p>Text is split at <code>.</code> characters, <em>except</em>:</p>
+        <ul>
+          <li>Inside quoted strings</li>
+          <li>Decimal numbers (<code>3.14</code>)</li>
+          <li>Dot notation (<code>math.sqrt</code>)</li>
+        </ul>
+        <h4>Pass 2 &mdash; Tokenization</h4>
+        <p>Each sentence is split via <code>shlex.split()</code>. Quoted strings stay intact. Non-quoted tokens are lowercased. The trailing period is stripped.</p>
+        <h4>Multi-word phrase merging</h4>
+        <p>Before parsing, these phrases are merged into single tokens (longest first):</p>
+<pre>is not          is above        is below        is at least
+is at most      divided by      to the power of bring in
+how to          otherwise if    run function    delete variable
+to number       to decimal      to text         to boolean
+to list         to tuple        to set          to dictionary
+to bytes        to complex</pre>
+      </div>
+
+      <h2 class="block">Statements</h2>
+
+      <h3 id="say">say &mdash; Print <a href="#say" class="anchor-link">¶</a></h3>
+<pre><span class="kw">say</span> .
+<span class="kw">say</span> <span class="str">"Hello."</span>.
+<span class="kw">say</span> score.
+<span class="kw">say</span> <span class="num">42</span>.</pre>
+      <p>Transpiles to <code>print( )</code>.</p>
+
+      <h3 id="set">set &mdash; Assignment <a href="#set" class="anchor-link">¶</a></h3>
+<pre><span class="kw">set</span> &lt;name&gt; <span class="kw">to</span> &lt;expr&gt;.
+<span class="kw">set</span> x <span class="kw">to</span> <span class="num">10</span>.
+<span class="kw">set</span> name <span class="kw">to</span> <span class="str">"Aman"</span>.
+<span class="kw">set</span> total <span class="kw">to</span> x <span class="kw">times</span> <span class="num">3</span> <span class="kw">plus</span> <span class="num">1</span>.</pre>
+      <p><strong>String slicing:</strong></p>
+<pre><span class="kw">set</span> &lt;name&gt; <span class="kw">to</span> &lt;source&gt; <span class="kw">from</span> &lt;start&gt; <span class="kw">to</span> &lt;end&gt;.
+<span class="kw">set</span> piece <span class="kw">to</span> name <span class="kw">from</span> <span class="num">0</span> <span class="kw">to</span> <span class="num">5</span>.   <span class="com"># → piece = name[0:5]</span></pre>
+      <p><strong>Function return value:</strong></p>
+<pre><span class="kw">set</span> response <span class="kw">to</span> <span class="kw">run</span> requests.get <span class="kw">with</span> <span class="str">"https://api.github.com"</span>.
+<span class="kw">set</span> random_num <span class="kw">to</span> <span class="kw">run</span> random.randint <span class="kw">with</span> <span class="num">1</span>, <span class="num">10</span>.</pre>
+
+      <h3 id="add">add / subtract &mdash; In-place arithmetic <a href="#add" class="anchor-link">¶</a></h3>
+<pre><span class="kw">add</span> &lt;n&gt; <span class="kw">to</span> &lt;var&gt;.
+<span class="kw">subtract</span> &lt;n&gt; <span class="kw">from</span> &lt;var&gt;.
+
+<span class="kw">add</span> <span class="num">1</span> <span class="kw">to</span> counter.        <span class="com"># → counter += 1</span>
+<span class="kw">subtract</span> <span class="num">5</span> <span class="kw">from</span> health.     <span class="com"># → health -= 5</span></pre>
+
+      <h3 id="delete">delete variable <a href="#delete" class="anchor-link">¶</a></h3>
+<pre><span class="kw">delete variable</span> &lt;name&gt;.</pre>
+
+      <h3 id="ask">ask &mdash; Input <a href="#ask" class="anchor-link">¶</a></h3>
+<pre><span class="kw">ask</span> <span class="str">" "</span> <span class="kw">into</span> &lt;name&gt;.
+<span class="kw">ask</span> <span class="str">"Your name: "</span> <span class="kw">into</span> username.</pre>
+      <p>Exactly 4 tokens required. <code>into</code> is mandatory. Returns a string &mdash; use type casting for numbers.</p>
+
+      <h3 id="if">if / otherwise if / otherwise / end &mdash; Conditionals <a href="#if" class="anchor-link">¶</a></h3>
+<pre><span class="kw">if</span> &lt;cond&gt;.
+  ...
+<span class="kw">otherwise if</span> &lt;cond&gt;.
+  ...
+<span class="kw">otherwise</span>.
+  ...
+<span class="kw">end</span>.</pre>
+      <p>Conditions support <code>and</code>, <code>or</code>, <code>not</code>:</p>
+<pre><span class="kw">if</span> age <span class="kw">is at least</span> <span class="num">18</span> <span class="kw">and</span> verified <span class="kw">is</span> <span class="num">1</span>.
+  <span class="kw">say</span> <span class="str">"Access granted."</span>.
+<span class="kw">end</span>.</pre>
+
+      <h3 id="repeat">repeat &mdash; Count loop <a href="#repeat" class="anchor-link">¶</a></h3>
+<pre><span class="kw">repeat</span> &lt;n&gt;.
+  ...
+<span class="kw">end</span>.</pre>
+      <p>Anonymous loop variable (<code>_</code>). Transpiles to <code>for _ in range(n):</code>.</p>
+
+      <h3 id="count">count &mdash; Ranged loop <a href="#count" class="anchor-link">¶</a></h3>
+<pre><span class="kw">count from</span> &lt;start&gt; <span class="kw">to</span> &lt;end&gt; <span class="kw">variable</span> &lt;i&gt;.
+  ...
+<span class="kw">end</span>.
+
+<span class="kw">count from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span> <span class="kw">variable</span> i.
+  <span class="kw">say</span> i.
+<span class="kw">end</span>.</pre>
+      <p><strong>With step:</strong></p>
+<pre><span class="kw">count from</span> <span class="num">10</span> <span class="kw">to</span> <span class="num">0</span> <span class="kw">variable</span> i <span class="kw">stepping</span> -<span class="num">2</span>.
+  <span class="kw">say</span> i.
+<span class="kw">end</span>.</pre>
+      <p>The parser adjusts the range end by <code>+1</code> (forward) or <code>-1</code> (backward).</p>
+
+      <h3 id="while">while &mdash; Condition loop <a href="#while" class="anchor-link">¶</a></h3>
+<pre><span class="kw">while</span> lives <span class="kw">is above</span> <span class="num">0</span>.
+  <span class="kw">subtract</span> <span class="num">1</span> <span class="kw">from</span> lives.
+<span class="kw">end</span>.</pre>
+
+      <h3 id="howto">how to / run &mdash; Functions <a href="#howto" class="anchor-link">¶</a></h3>
+<pre><span class="com"># Define</span>
+<span class="kw">how to</span> &lt;name&gt;.
+  ...
+<span class="kw">end</span>.
+
+<span class="kw">how to</span> &lt;name&gt; <span class="kw">with</span> &lt;a&gt;, &lt;b&gt;.
+  ...
+<span class="kw">end</span>.
+
+<span class="com"># Call</span>
+<span class="kw">run</span> &lt;name&gt;.
+<span class="kw">run</span> &lt;name&gt; <span class="kw">with</span> &lt;a&gt;, &lt;b&gt;.
+<span class="kw">run function</span> &lt;name&gt; <span class="kw">with</span> &lt;a&gt;.</pre>
+      <p><code>run</code> and <code>run function</code> are identical. Dot notation works:</p>
+<pre><span class="kw">bring in</span> requests.
+<span class="kw">run</span> requests.get <span class="kw">with</span> <span class="str">"https://api.github.com"</span>.</pre>
+
+      <h3 id="bringin">bring in &mdash; Import <a href="#bringin" class="anchor-link">¶</a></h3>
+<pre><span class="kw">bring in</span> math.
+<span class="kw">set</span> pi <span class="kw">to</span> math.pi.
+<span class="kw">set</span> result <span class="kw">to</span> <span class="kw">run function</span> math.sqrt <span class="kw">with</span> <span class="num">16</span>.</pre>
+
+      <h3 id="note">note / notes &mdash; Comments <a href="#note" class="anchor-link">¶</a></h3>
+<pre><span class="kw">note</span> single line comment.
+
+<span class="kw">notes</span>.
+  block comment
+  spanning lines.
+<span class="kw">endnotes</span>.</pre>
+
+      <h3 id="python">python / pythonend &mdash; Inspect generated code <a href="#python" class="anchor-link">¶</a></h3>
+<pre><span class="kw">python</span>.
+<span class="kw">set</span> x <span class="kw">to</span> <span class="num">5</span> <span class="kw">plus</span> <span class="num">3</span>.
+<span class="kw">pythonend</span>.</pre>
+      <p>Output: <code>PY_GEN: x = 5 + 3</code></p>
+
+      <h3 id="debug">debug / debugend &mdash; Token trace <a href="#debug" class="anchor-link">¶</a></h3>
+<pre><span class="kw">debug</span>.
+<span class="kw">set</span> x <span class="kw">to</span> <span class="num">10</span>.
+<span class="kw">debugend</span>.</pre>
+      <p>Output: <code>DEBUG: set x to 10</code></p>
+
+      <h2 class="block">Operators</h2>
+      <h3>Arithmetic</h3>
+      <table>
+        <thead><tr><th>Ethos</th><th>Python</th></tr></thead>
+        <tbody>
+          <tr><td><code>plus</code></td><td><code>+</code></td></tr>
+          <tr><td><code>minus</code></td><td><code>-</code></td></tr>
+          <tr><td><code>times</code></td><td><code>*</code></td></tr>
+          <tr><td><code>divided by</code></td><td><code>/</code></td></tr>
+          <tr><td><code>to the power of</code></td><td><code>**</code></td></tr>
+        </tbody>
+      </table>
+      <h3>Comparison</h3>
+      <table>
+        <thead><tr><th>Ethos</th><th>Python</th></tr></thead>
+        <tbody>
+          <tr><td><code>is</code></td><td><code>==</code></td></tr>
+          <tr><td><code>is not</code></td><td><code>!=</code></td></tr>
+          <tr><td><code>is above</code></td><td><code>&gt;</code></td></tr>
+          <tr><td><code>is below</code></td><td><code>&lt;</code></td></tr>
+          <tr><td><code>is at least</code></td><td><code>&gt;=</code></td></tr>
+          <tr><td><code>is at most</code></td><td><code>&lt;=</code></td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="block">Type casting</h2>
+      <table>
+        <thead><tr><th>Ethos phrase</th><th>Python</th></tr></thead>
+        <tbody>
+          <tr><td><code>to number</code></td><td><code>int()</code></td></tr>
+          <tr><td><code>to decimal</code></td><td><code>float()</code></td></tr>
+          <tr><td><code>to text</code></td><td><code>str()</code></td></tr>
+          <tr><td><code>to boolean</code></td><td><code>bool()</code></td></tr>
+          <tr><td><code>to list</code></td><td><code>list()</code></td></tr>
+          <tr><td><code>to tuple</code></td><td><code>tuple()</code></td></tr>
+          <tr><td><code>to set</code></td><td><code>set()</code></td></tr>
+          <tr><td><code>to dictionary</code></td><td><code>dict()</code></td></tr>
+          <tr><td><code>to bytes</code></td><td><code>bytes()</code></td></tr>
+          <tr><td><code>to complex</code></td><td><code>complex()</code></td></tr>
+        </tbody>
+      </table>
+      <pre><span class="kw">set</span> age <span class="kw">to</span> <span class="str">"25"</span> <span class="kw">to number</span>.     <span class="com"># → age = int("25")</span>
+<span class="kw">set</span> pi  <span class="kw">to</span> <span class="str">"3.14"</span> <span class="kw">to decimal</span>.  <span class="com"># → pi  = float("3.14")</span></pre>
+
+      <h2 class="block">Errors</h2>
+      <p>Ethos surfaces Python tracebacks directly, prefixed with context from the source sentence. If a Hard Trait fails to load, the runtime reports which trait and which function was missing.</p>
+
+      <div class="foot">
+        <span>Source: <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">DOCS.md</a> (official reference)</span>
+        <span>Try it: <a href="#" data-sec="playground">Playground</a></span>
+      </div>
+    </section>
+
+    <section id="traits" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Ecosystem</div>
+        <h1>Traits</h1>
+        <p class="subtitle">Traits are how Ethos extends itself. There are two kinds: <strong>Soft Traits</strong> (Python packages) and <strong>Hard Traits</strong> (compiled native binaries). Both are installed and managed by <a href="#" data-sec="forge">Forge</a>.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="icon">◇</div>
+          <h4>Soft Trait</h4>
+          <p>A Python package installed from PyPI or a local file. Used in Ethos with <code>bring in</code>. Lives in <code>~/.ethos/traits/</code>.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">◆</div>
+          <h4>Hard Trait</h4>
+          <p>A compiled shared library (C, C++, Rust &mdash; anything with a C ABI) packaged as a zip with a <code>manifest.json</code>. Loads via <code>ctypes</code>.</p>
+        </div>
+      </div>
+
+      <h2 class="block">Soft Traits &mdash; Python packages</h2>
+      <p>Soft Traits are simply Python packages. Forge queries the PyPI JSON API, picks the best wheel for your platform (platform-specific first, then pure-Python <code>any</code>, then sdist fallback), downloads it, and extracts it into <code>~/.ethos/traits/</code>. Forge <strong>never runs install scripts</strong> &mdash; it only extracts the archive.</p>
+      <p>For a package to be importable, its top-level module folder must land directly inside <code>~/.ethos/traits/</code> after extraction.</p>
+
+      <pre><span class="com"># Install from PyPI</span>
+$ forge pymodule get requests
+
+<span class="com"># Then in Ethos</span>
+<span class="kw">bring in</span> requests.
+<span class="kw">set</span> response <span class="kw">to</span> <span class="kw">run</span> requests.get <span class="kw">with</span> <span class="str">"https://api.github.com"</span>.
+<span class="kw">say</span> response.</pre>
+
+      <h2 class="block">Hard Traits &mdash; Native binaries</h2>
+      <p>A Hard Trait is a compiled shared library (a <code>.so</code> on Linux/Termux, <code>.dylib</code> on macOS, <code>.dll</code> on Windows) plus a <code>manifest.json</code> describing its functions. Ethos loads it via <code>ctypes</code> at startup.</p>
+
+      <h3>Hard Trait folder layout</h3>
+<pre>~/.ethos/traits/hard_traits/&lt;name&gt;/&lt;version&gt;/
+├── manifest.json
+└── (compiled binary here)</pre>
+
+      <h3 id="manifest">manifest.json <a href="#manifest" class="anchor-link">¶</a></h3>
+      <p>The manifest declares the trait's name, version, author, license, all 8 platform binaries, checksums, and the functions Ethos can call. Every Hard Trait submitted to <a href="#" data-sec="foundry">Foundry</a> must include <strong>all 8 platforms</strong>.</p>
+
+      <div class="card info">
+        <h4>Required fields</h4>
+        <ul>
+          <li><code>name</code> &mdash; must match your folder name exactly.</li>
+          <li><code>version</code> &mdash; semver like <code>1.0.0</code> or <code>0.5.0-beta</code>.</li>
+          <li><code>description</code> &mdash; one line about what it does.</li>
+          <li><code>author</code> &mdash; your name or handle.</li>
+          <li><code>repository</code> &mdash; link to your trait's source repo.</li>
+          <li><code>license</code> &mdash; MIT, Apache-2.0, etc. (no proprietary licenses accepted on Foundry).</li>
+          <li><code>platforms</code> &mdash; object with <strong>all 8 platform entries</strong>, each with <code>url</code> and <code>checksum</code>.</li>
+          <li><code>functions</code> &mdash; list of functions Ethos can call, each with <code>return</code> and <code>args</code>.</li>
+        </ul>
+        <h4>Optional fields</h4>
+        <ul>
+          <li><code>tags</code> &mdash; keywords like <code>["math", "crypto"]</code> for search.</li>
+          <li><code>verified</code> &mdash; leave <code>false</code>; Aman sets it to <code>true</code> after review.</li>
+        </ul>
+      </div>
+
+      <h3>Example manifest.json</h3>
+<pre>{
+  <span class="str">"name"</span>: <span class="str">"mymath"</span>,
+  <span class="str">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="str">"description"</span>: <span class="str">"Fast integer math"</span>,
+  <span class="str">"author"</span>: <span class="str">"Aman"</span>,
+  <span class="str">"repository"</span>: <span class="str">"https://github.com/AmanCode22/ethos-trait-mymath"</span>,
+  <span class="str">"license"</span>: <span class="str">"MIT"</span>,
+  <span class="str">"tags"</span>: [<span class="str">"math"</span>],
+  <span class="str">"verified"</span>: false,
+  <span class="str">"platforms"</span>: {
+    <span class="str">"linux-x86_64"</span>:    { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"linux-aarch64"</span>:   { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"macos-arm64"</span>:     { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"macos-x86_64"</span>:    { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"windows"</span>:         { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"windows-arm64"</span>:   { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"termux-aarch64"</span>:  { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> },
+    <span class="str">"termux-armv7"</span>:    { <span class="str">"url"</span>: <span class="str">"..."</span>, <span class="str">"checksum"</span>: <span class="str">"sha256: ..."</span> }
+  },
+  <span class="str">"functions"</span>: {
+    <span class="str">"add_ints"</span>:    { <span class="str">"return"</span>: <span class="str">"int"</span>,    <span class="str">"args"</span>: [<span class="str">"int"</span>, <span class="str">"int"</span>] },
+    <span class="str">"get_message"</span>: { <span class="str">"return"</span>: <span class="str">"char *"</span>, <span class="str">"args"</span>: [] }
+  }
+}</pre>
+
+      <h3>Supported C types</h3>
+      <table>
+        <thead><tr><th>Category</th><th>Manifest strings</th></tr></thead>
+        <tbody>
+          <tr><td>Characters</td><td><code>char</code>, <code>unsigned char</code>, <code>wchar_t</code></td></tr>
+          <tr><td>Integers</td><td><code>short</code>, <code>unsigned short</code>, <code>int</code>, <code>unsigned int</code>, <code>long</code>, <code>unsigned long</code>, <code>long long</code>, <code>unsigned long long</code></td></tr>
+          <tr><td>Fixed-width ints</td><td><code>int8_t</code>, <code>uint8_t</code>, <code>int16_t</code>, <code>uint16_t</code></td></tr>
+          <tr><td>Floating point</td><td><code>float</code>, <code>double</code>, <code>long double</code></td></tr>
+          <tr><td>Strings / pointers</td><td><code>char *</code>, <code>wchar_t *</code>, <code>void *</code>, <code>pointer_to_int</code></td></tr>
+          <tr><td>Sizes</td><td><code>size_t</code>, <code>ssize_t</code></td></tr>
+          <tr><td>Other</td><td><code>bool</code>, <code>void</code></td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="block">Using a Hard Trait in Ethos</h2>
+      <p>Here's the real end-to-end flow, using <code>greetr</code> &mdash; my verified Rust sample trait &mdash; as the example:</p>
+<pre><span class="com"># Install a trait from Foundry</span>
+$ forge foundry get greetr
+
+<span class="com"># Then in Ethos</span>
+<span class="kw">bring in</span> greetr.
+<span class="kw">set</span> result <span class="kw">to</span> <span class="kw">run</span> greetr.greet <span class="kw">with</span> <span class="str">"Aman"</span>.
+<span class="kw">say</span> result.</pre>
+
+      <h2 class="block">Writing your own Hard Trait</h2>
+      <p>Start from one of the official templates &mdash; they include CI workflows that automatically build binaries for all 8 platforms when you tag a release.</p>
+      <div class="install-grid">
+        <a href="https://github.com/AmanCode22/ethos-trait-c-template" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>C template</h4>
+          <p>CMake-based. Starter <code>src/trait.c</code>. Best for simplest FFI.</p>
+          <div class="cmd">ethos-trait-c-template ↗</div>
+        </a>
+        <a href="https://github.com/AmanCode22/ethos-trait-cpp-template" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>C++ template</h4>
+          <p>CMake-based. Starter <code>src/trait.cpp</code>. Use <code>extern "C"</code> for exports.</p>
+          <div class="cmd">ethos-trait-cpp-template ↗</div>
+        </a>
+        <a href="https://github.com/AmanCode22/ethos-trait-rust-template" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>Rust template</h4>
+          <p>Cargo-based. Use <code>#[no_mangle] extern "C"</code> for exports.</p>
+          <div class="cmd">ethos-trait-rust-template ↗</div>
+        </a>
+      </div>
+
+      <h3>Verified sample traits</h3>
+      <p>Three sample Hard Traits &mdash; one per language &mdash; show how a real trait looks end-to-end. All three are on Foundry and verified. Each is a "greet" trait &mdash; the simplest possible native function that returns a greeting string.</p>
+      <div class="install-grid">
+        <a href="https://github.com/AmanCode22/ethos-trait-greetc" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>greetc <span class="badge opt">verified</span></h4>
+          <p>Sample trait written in C for greet. The simplest reference implementation.</p>
+          <div class="cmd">forge foundry get greetc</div>
+        </a>
+        <a href="https://github.com/AmanCode22/ethos-trait-greetcpp" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>greetcpp <span class="badge opt">verified</span></h4>
+          <p>Sample trait written in C++ for greet. Shows <code>extern "C"</code> exports.</p>
+          <div class="cmd">forge foundry get greetcpp</div>
+        </a>
+        <a href="https://github.com/AmanCode22/ethos-trait-greetr" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>greetr <span class="badge opt">verified</span></h4>
+          <p>Sample trait written in Rust for greet. Shows <code>#[no_mangle] extern "C"</code>.</p>
+          <div class="cmd">forge foundry get greetr</div>
+        </a>
+      </div>
+
+      <div class="card warn">
+        <h4>Want a template for another language?</h4>
+        <p>If you want to contribute an API for a language other than C / C++ / Rust (e.g. Go, Zig, Java), <strong>open an issue first</strong> on <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener"><code>ethos-foundry</code></a> with a link to your template repo. Once reviewed and accepted, it will be linked from the Foundry README &mdash; do not open a PR with a new language binding without an issue first.</p>
+      </div>
+
+      <div class="foot">
+        <span>Forge commands: <a href="#" data-sec="forge">Forge reference</a></span>
+        <span>Submission rules: <a href="#" data-sec="foundry">Foundry rules</a></span>
+      </div>
+    </section>
+
+    <section id="forge" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Ecosystem</div>
+        <h1><img src="https://raw.githubusercontent.com/AmanCode22/forge/main/forge_logo.png" alt="Forge" class="card-logo-img" style="width:32px;height:32px;vertical-align:middle;margin-right:8px;border-radius:6px" />Forge</h1>
+        <p class="subtitle">The package manager for Ethos. Install Traits. Manage dependencies. Stay out of your way. Forge installs <strong>Soft Traits</strong> (Python packages from PyPI or local files) and <strong>Hard Traits</strong> (compiled native binaries) into your Ethos environment.</p>
+      </div>
+
+      <div class="card info">
+        <h4>One installer, both tools</h4>
+        <p>On Windows and macOS, the combined installer from <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">ethos-lang releases</a> sets up <strong>both Ethos and Forge</strong> in one shot. On Linux, installing <code>ethos-forge</code> pulls <code>ethos-lang</code> as a hard dependency.</p>
+      </div>
+
+      <h2 class="block">Version &amp; help</h2>
+<pre>$ forge --version
+$ forge -v
+$ forge --help</pre>
+
+      <h2 class="block">Soft Traits &mdash; Python packages</h2>
+
+      <h3>Install from PyPI</h3>
+<pre>$ forge pymodule get requests</pre>
+      <p>Forge queries the PyPI JSON API, picks the best wheel for your platform (platform-specific first, then pure-Python <code>any</code>, then sdist fallback), downloads it, and extracts it into <code>~/.ethos/traits/</code>.</p>
+
+      <h3>Install from a remote wheel URL</h3>
+<pre>$ forge pymodule wheel get &lt;url&gt;</pre>
+
+      <h3>Install from a local <code>.whl</code> file</h3>
+<pre>$ forge pymodule wheel local &lt;path&gt;</pre>
+
+      <h3>Install from a remote sdist tarball</h3>
+<pre>$ forge pymodule sdist get &lt;url&gt;</pre>
+
+      <h3>Install from a local <code>.tar.gz</code> sdist</h3>
+<pre>$ forge pymodule sdist local &lt;path&gt;</pre>
+
+      <div class="card info">
+        <h4>How Soft Trait installation works</h4>
+        <p>Forge <strong>never runs install scripts</strong> &mdash; it only extracts the archive. Platform detection works by reading <code>sysconfig.get_platform()</code> and matching against wheel filenames. For a package to be importable, its top-level module folder must land directly inside <code>~/.ethos/traits/</code> after extraction.</p>
+      </div>
+
+      <h2 class="block">Hard Traits &mdash; native binaries</h2>
+      <h3>Install from a URL</h3>
+<pre>$ forge get &lt;url&gt;</pre>
+      <p>Forge downloads the zip, finds <code>manifest.json</code> at any depth, validates <code>name</code> and <code>binary</code>, and moves the trait folder into <code>~/.ethos/traits/hard_traits/&lt;name&gt;/&lt;version&gt;/</code>.</p>
+
+      <h3>Install from a local zip</h3>
+<pre>$ forge local &lt;path-to-zip&gt;</pre>
+
+      <h2 class="block">Foundry support</h2>
+      <p>Foundry is the curated registry of Hard Traits. Forge can search and install directly from it.</p>
+<pre><span class="com"># Search for a hard trait in Foundry</span>
+$ forge foundry search greetr
+
+<span class="com"># Install a trait from Foundry</span>
+$ forge foundry get greetr</pre>
+
+      <h2 class="block">Listing installed traits</h2>
+<pre>$ forge list            <span class="com"># everything</span>
+$ forge list pymodule   <span class="com"># Soft Traits only</span>
+$ forge list native     <span class="com"># Hard Traits only</span></pre>
+
+      <h2 class="block">Removing traits</h2>
+<pre>$ forge remove &lt;name&gt;           <span class="com"># Hard Trait</span>
+$ forge remove pymodule &lt;name&gt;  <span class="com"># Soft Trait</span></pre>
+
+      <h2 class="block">Output prefixes</h2>
+      <p>Forge uses consistent prefixes to indicate status:</p>
+      <table>
+        <thead><tr><th>Prefix</th><th>Means</th></tr></thead>
+        <tbody>
+          <tr><td><code>[*]</code></td><td>in progress</td></tr>
+          <tr><td><code>[+]</code></td><td>success</td></tr>
+          <tr><td><code>[-]</code></td><td>something went wrong</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="block">Build from source</h2>
+      <p>Requires Python 3.10+. No dependencies beyond the standard library.</p>
+<pre>$ git clone https://github.com/AmanCode22/forge.git
+$ cd forge
+$ python main.py --help</pre>
+
+      <h2 class="block">Status</h2>
+      <div class="status-banner">
+        <div class="ic">!</div>
+        <div>
+          <strong>Rust rewrite in progress (paused).</strong>
+          <p>Forge alongside Ethos is being rewritten in Rust. Status is tracked on the <code>rust-rewrite</code> branch. The goal is to keep the Rust version as similar to the Python version as possible. The rewrite is paused pending testers.</p>
+        </div>
+      </div>
+
+      <div class="foot">
+        <span>Source: <a href="https://github.com/AmanCode22/forge" target="_blank" rel="noopener">github.com/AmanCode22/forge</a></span>
+        <span>Install: <a href="#" data-sec="install">Install guide</a></span>
+      </div>
+    </section>
+
+    <section id="foundry" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Ecosystem</div>
+        <h1>Foundry</h1>
+        <p class="subtitle">Foundry is the Hard Trait registry for Ethos, hosted in two places &mdash; pick whichever you prefer:</p>
+      </div>
+
+      <div class="install-grid" style="margin-top:8px">
+        <a href="https://foundry-ethos.pages.dev" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>☁ Primary &mdash; Cloudflare Pages</h4>
+          <p>The canonical live registry. Fast global CDN. This is what <code>forge foundry</code> queries by default.</p>
+          <div class="cmd">foundry-ethos.pages.dev ↗</div>
+        </a>
+        <a href="https://amancode22.github.io/ethos-foundry/" target="_blank" rel="noopener" class="install-card" style="text-decoration:none;color:inherit">
+          <h4>⬡ Mirror &mdash; GitHub Pages</h4>
+          <p>The same registry, mirrored on GitHub Pages. Useful if Cloudflare is unreachable in your region.</p>
+          <div class="cmd">amancode22.github.io/ethos-foundry ↗</div>
+        </a>
+      </div>
+
+      <div class="card danger">
+        <h4>The one rule that matters</h4>
+        <p>Every Hard Trait <strong>must</strong> support <strong>all 8 platforms</strong> &mdash; Linux x86_64, Linux ARM64, macOS Intel, macOS Apple Silicon, Windows x86_64, Windows arm64, Termux ARM64, Termux ARMv7. If yours does not support one of these, <strong>first open an issue</strong> on <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener"><code>ethos-foundry</code></a> explaining why. Otherwise the PR will be rejected.</p>
+      </div>
+
+      <div class="card info">
+        <h4>What Foundry is &mdash; and what it is not</h4>
+        <p>Foundry is a <strong>registry</strong>, not a documentation site. It does not list trait inventories in any other form &mdash; the canonical list of available traits is what <code>forge foundry search</code> returns. Foundry itself is just JSON manifests; there is no separate "trait catalogue" page to maintain. This is intentional: a single source of truth (the manifests on Cloudflare Pages) means what you see via <code>forge</code> is always accurate.</p>
+      </div>
+
+      <h2 class="block">Verified sample traits</h2>
+      <p>Three sample "greet" traits &mdash; one per supported language &mdash; are verified and live on Foundry right now. They're the simplest possible reference implementations, useful as a starting point if you're writing your own.</p>
+      <table>
+        <thead><tr><th>Trait</th><th>Language</th><th>Description</th><th>Install</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><code>greetc</code></td><td>C</td><td>Sample trait written in C for greet.</td><td><code>forge foundry get greetc</code></td><td><span class="badge opt">verified</span></td></tr>
+          <tr><td><code>greetcpp</code></td><td>C++</td><td>Sample trait written in C++ for greet.</td><td><code>forge foundry get greetcpp</code></td><td><span class="badge opt">verified</span></td></tr>
+          <tr><td><code>greetr</code></td><td>Rust</td><td>Sample trait written in Rust for greet.</td><td><code>forge foundry get greetr</code></td><td><span class="badge opt">verified</span></td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="block">Quick use</h2>
+<pre><span class="com"># Search the registry</span>
+$ forge foundry search greet
+
+<span class="com"># Install a trait (e.g. my verified Rust sample)</span>
+$ forge foundry get greetr
+
+<span class="com"># List what you have installed</span>
+$ forge list native</pre>
+      <p>Then in Ethos:</p>
+<pre><span class="kw">bring in</span> greetr.
+<span class="kw">set</span> result <span class="kw">to</span> <span class="kw">run</span> greetr.greet <span class="kw">with</span> <span class="str">"Aman"</span>.
+<span class="kw">say</span> result.</pre>
+
+      <h2 class="block">How it works &mdash; the full lifecycle</h2>
+      <ol class="steps">
+        <li><strong>You write a Hard Trait</strong> using one of the official template repos (C, C++, or Rust). The template has GitHub Actions that build binaries for <strong>all 8 platforms</strong> automatically.</li>
+        <li><strong>You tag a release</strong> (e.g. <code>v1.0.0</code>). The workflows build binaries for all 8 platforms and upload them to GitHub Releases.</li>
+        <li><strong>You open a PR to Foundry</strong> with the auto-generated <code>manifest.json</code> from your release. <em>You must open a PR to Foundry for each version bump also</em> &mdash; the manifest in your release is different from the one in your source repo.</li>
+        <li><strong>The PR is reviewed personally.</strong> If it looks good, it's merged. The trait goes live on Foundry.</li>
+      </ol>
+      <div class="card warn">
+        <h4>Note</h4>
+        <p>Traits that don't support all platforms will not be accepted. This ensures every user can use every trait, no matter their device. <strong>Or else open an issue first, else the PR will be rejected.</strong></p>
+      </div>
+
+      <h2 class="block">Required platforms &mdash; all 8 <span class="badge req">required</span></h2>
+      <p>Every trait must include binaries for all of these. No partial support.</p>
+      <table>
+        <thead><tr><th>Tag</th><th>OS</th><th>Arch</th><th>Extension</th></tr></thead>
+        <tbody>
+          <tr><td><code>linux-x86_64</code></td><td>Linux</td><td>x86_64</td><td><code>.so</code></td></tr>
+          <tr><td><code>linux-aarch64</code></td><td>Linux</td><td>ARM64</td><td><code>.so</code></td></tr>
+          <tr><td><code>macos-arm64</code></td><td>macOS</td><td>Apple Silicon</td><td><code>.dylib</code></td></tr>
+          <tr><td><code>macos-x86_64</code></td><td>macOS</td><td>Intel</td><td><code>.dylib</code></td></tr>
+          <tr><td><code>windows</code></td><td>Windows</td><td>x86_64</td><td><code>.dll</code></td></tr>
+          <tr><td><code>windows-arm64</code></td><td>Windows</td><td>arm64</td><td><code>.dll</code></td></tr>
+          <tr><td><code>termux-aarch64</code></td><td>Android / Termux</td><td>ARM64</td><td><code>.so</code></td></tr>
+          <tr><td><code>termux-armv7</code></td><td>Android / Termux</td><td>ARMv7</td><td><code>.so</code></td></tr>
+        </tbody>
+      </table>
+      <div class="card danger">
+        <h4>If your trait can't build on one of these</h4>
+        <p>Open an issue on <code>ethos-foundry</code> first, explain the platform limitation, and wait for a response. <strong>Then</strong> submit the PR. PRs that skip this step are rejected automatically.</p>
+      </div>
+
+      <h2 class="block">Adding your trait</h2>
+      <ol class="steps">
+        <li><strong>Fork a template.</strong> Pick your language:
+          <ul>
+            <li>C: <a href="https://github.com/AmanCode22/ethos-trait-c-template" target="_blank" rel="noopener"><code>ethos-trait-c-template</code></a></li>
+            <li>C++: <a href="https://github.com/AmanCode22/ethos-trait-cpp-template" target="_blank" rel="noopener"><code>ethos-trait-cpp-template</code></a></li>
+            <li>Rust: <a href="https://github.com/AmanCode22/ethos-trait-rust-template" target="_blank" rel="noopener"><code>ethos-trait-rust-template</code></a></li>
+          </ul>
+          These repos have starter code, build config, and CI workflows. They compile for all 8 platforms automatically when you tag a release. You don't need to build anything locally.
+        </li>
+        <li><strong>Build and release.</strong> Write your code. Push. Tag a release like <code>v1.0.0</code>. The workflows build binaries for all platforms and upload them to GitHub Releases automatically.</li>
+        <li><strong>Open a PR.</strong> The GitHub workflow auto-creates a <code>manifest.json</code> for the PR. You just need to use that and you're done.</li>
+        <li><strong>Review and merge.</strong> The PR is reviewed personally. If it passes, it's merged. The trait goes live on Foundry.</li>
+      </ol>
+
+      <h2 class="block">Updating your trait</h2>
+      <p>When you release a new version:</p>
+      <ol class="steps">
+        <li>Update your trait repo and tag a new release (e.g. <code>v2.0.0</code>).</li>
+        <li>The CI builds new binaries for all platforms and uploads them.</li>
+        <li>You open a PR to Foundry with the updated <code>manifest.json</code>.</li>
+        <li>The PR is reviewed and merged. Users get the latest version when they run <code>forge foundry get</code>.</li>
+      </ol>
+      <p>You don't need to do anything extra. Just tag a release and open a PR.</p>
+
+      <h2 class="block">Rules &mdash; the same rules apply to templates and platform support</h2>
+      <div class="card danger">
+        <h4>Rejection rules &mdash; mechanical, no judgement calls</h4>
+        <ul>
+          <li><strong>Folder name must equal <code>manifest.name</code>.</strong> If they don't match, the PR is rejected.</li>
+          <li><strong>All 8 platforms must be supported.</strong> No partial support. If a platform can't build, open an issue first. Otherwise: rejected.</li>
+          <li><strong>No binaries in the repo.</strong> Binaries live on GitHub Releases, not in the Foundry repo. PRs containing binaries are rejected.</li>
+          <li><strong>All URLs must be public.</strong> No authenticated URLs, no rate-limited URLs.</li>
+          <li><strong>Checksums are mandatory (SHA256).</strong> Every platform entry must have a <code>sha256:</code> checksum. Missing checksum = rejected.</li>
+          <li><strong>Public license only.</strong> MIT, Apache-2.0, etc. No proprietary licenses accepted on Foundry.</li>
+          <li><strong>PR required for each version bump.</strong> Don't edit manifests in-place &mdash; open a new PR with the new release's manifest.</li>
+          <li><strong>New language bindings require an issue first.</strong> Don't open a PR with a new language template &mdash; open an issue on Foundry with the repo link first.</li>
+        </ul>
+      </div>
+
+      <div class="card info">
+        <h4>The PR rules are the Foundry rules &mdash; everywhere</h4>
+        <p>The same rules apply across the Ethos ecosystem, because it's all maintained as one project:</p>
+        <ul>
+          <li><strong>Foundry PRs</strong> &rarr; must follow the 8-platform rule and the open-issue-first rule.</li>
+          <li><strong>Template repos</strong> &rarr; must build on all 8 platforms via CI; no platform-specific code without <code>#ifdef</code> guards.</li>
+          <li><strong>Ethos itself</strong> &rarr; must run on Windows, macOS, Linux, and Termux; the Rust rewrite will preserve this.</li>
+        </ul>
+        <p>If a platform requirement can't be met, the answer is always the same: <strong>open an issue first, explain why, then PR.</strong> Otherwise the PR is rejected.</p>
+      </div>
+
+      <h2 class="block">Links</h2>
+      <ul>
+        <li>Foundry repo: <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener"><code>AmanCode22/ethos-foundry</code></a></li>
+        <li>Live registry: <a href="https://foundry-ethos.pages.dev" target="_blank" rel="noopener"><code>foundry-ethos.pages.dev</code></a></li>
+        <li>Mirror: <a href="https://amancode22.github.io/ethos-foundry/" target="_blank" rel="noopener"><code>amancode22.github.io/ethos-foundry</code></a></li>
+        <li>Ethos docs: <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">DOCS.md</a></li>
+        <li>C template: <a href="https://github.com/AmanCode22/ethos-trait-c-template" target="_blank" rel="noopener"><code>ethos-trait-c-template</code></a></li>
+        <li>C++ template: <a href="https://github.com/AmanCode22/ethos-trait-cpp-template" target="_blank" rel="noopener"><code>ethos-trait-cpp-template</code></a></li>
+        <li>Rust template: <a href="https://github.com/AmanCode22/ethos-trait-rust-template" target="_blank" rel="noopener"><code>ethos-trait-rust-template</code></a></li>
+      </ul>
+
+      <div class="foot">
+        <span>License: MIT. Free to use, free to contribute.</span>
+        <span>Built by Aman Adlakha (Class 9, India). Solo project; every PR reviewed personally.</span>
+      </div>
+    </section>
+
+    <section id="playground" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Language</div>
+        <h1>Playground</h1>
+        <p class="subtitle">Runs entirely in your browser. A custom JavaScript <strong>lexer</strong> splits source into sentences and tokens; a custom <strong>transpiler</strong> converts Ethos to Python source code; <strong>Pyodide</strong> (CPython compiled to WASM) executes the Python and streams <code>print</code> output back. No server, no Node.js &mdash; Pyodide is fetched once from the jsDelivr CDN.</p>
+      </div>
+
+      <div class="examples-row" id="exampleChips">
+        <span class="chip" data-example="hello">hello.ethos</span>
+        <span class="chip" data-example="ask">ask + if</span>
+        <span class="chip" data-example="count">count loop</span>
+        <span class="chip" data-example="while">while + subtract</span>
+        <span class="chip" data-example="fn">how to / run</span>
+        <span class="chip" data-example="slice">string slice</span>
+        <span class="chip" data-example="cast">type cast</span>
+      </div>
+
+      <div class="pg-toolbar">
+        <button class="btn" id="btnLex" disabled>Tokenize</button>
+        <button class="btn" id="btnPy" disabled>Show Python</button>
+        <button class="btn primary" id="btnRun" disabled>Run ▶ (Pyodide)</button>
+        <button class="btn ghost" id="btnClear">Clear</button>
+        <span class="pg-status" id="pgStatus">pyodide: not loaded</span>
+      </div>
+
+      <div class="pg-layout">
+        <div class="pg-panel">
+          <header>
+            <span><span class="dot">●</span> editor · ethos</span>
+            <span id="srcInfo">0 lines</span>
+          </header>
+          <div class="pg-body">
+            <div id="editor" contenteditable="true" spellcheck="false"></div>
+          </div>
+        </div>
+        <div class="pg-panel">
+          <header>
+            <span><span class="dot">●</span> output</span>
+            <span id="outMode">stdout</span>
+          </header>
+          <div class="pg-body" style="display:flex;flex-direction:column">
+            <div class="out-mode-bar">
+              <button data-out="stdout" class="active">stdout</button>
+              <button data-out="tokens">tokens</button>
+              <button data-out="python">python</button>
+            </div>
+            <pre id="output" style="flex:1;overflow:auto"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="card info" style="margin-top:24px">
+        <h4>This playground uses the real Ethos compiler</h4>
+        <p>The playground runs the actual <a href="https://github.com/AmanCode22/ethos-lang/blob/main/src/ethos/lexer.py" target="_blank" rel="noopener"><code>src/ethos/lexer.py</code></a> and <a href="https://github.com/AmanCode22/ethos-lang/blob/main/src/ethos/parser.py" target="_blank" rel="noopener"><code>src/ethos/parser.py</code></a> from the <code>AmanCode22/ethos-lang</code> repository inside Pyodide (CPython compiled to WebAssembly). There is no JavaScript reimplementation &mdash; every token, every line of transpiled Python, and every runtime execution uses the real Ethos compiler code.</p>
+        <h4>How it works &mdash; three layers</h4>
+        <ol>
+          <li><strong>Lexer</strong> &mdash; <code>lexer.py</code> is loaded into the Pyodide virtual filesystem and imported as a Python module. Its <code>lex()</code> function splits source into sentences and tokenizes each one via <code>shlex.split()</code>, lowercasing non-quoted tokens.</li>
+          <li><strong>Parser</strong> &mdash; <code>parser.py</code> is imported the same way. Its <code>parse()</code> function converts the token stream into Python source code, tracking block nesting via the <code>if</code> / <code>otherwise if</code> / <code>otherwise</code> / <code>end</code> keywords and indenting the Python output accordingly.</li>
+          <li><strong>Pyodide runtime</strong> &mdash; the generated Python source is executed via <code>pyodide.runPythonAsync()</code>. <code>print</code> calls are captured by redirecting <code>sys.stdout</code> and displayed in the output panel.</li>
+        </ol>
+        <p>Because the real parser produces standard Python, you can read exactly what your Ethos code becomes &mdash; switch the output mode to <strong>python</strong> to see it. This matches the behaviour of the real Ethos <code>python.</code> &hellip; <code>pythonend.</code> block.</p>
+      </div>
+
+      <div class="card warn">
+        <h4>What works in the browser</h4>
+        <p>Because the playground uses the real compiler, it supports everything the real Ethos supports: <code>say</code>, <code>set</code>, <code>add</code>, <code>subtract</code>, <code>ask</code>, <code>if</code> / <code>otherwise</code> / <code>end</code>, <code>repeat</code>, <code>count</code>, <code>while</code>, <code>how to</code> / <code>run</code>, <code>bring in</code>, <code>note</code>, string slicing, type casting, and all arithmetic/comparison operators. Soft Trait imports from PyPI that ship with Pyodide (like <code>math</code>, <code>random</code>, <code>json</code>) work directly. Hard Traits require <code>ctypes</code> loading of native binaries, which is not available in the browser sandbox &mdash; install Ethos locally for the full Hard Trait experience.</p>
+      </div>
+
+      <div class="foot">
+        <span>Pyodide v0.25.0 · loaded from <code>cdn.jsdelivr.net</code></span>
+        <span>Need more? <a href="#" data-sec="install">Install Ethos locally</a></span>
+      </div>
+    </section>
+
+    <section id="examples" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Getting Started</div>
+        <h1>Examples</h1>
+        <p class="subtitle">Real Ethos code. Every snippet is compatible with the reference compiler and with the in-browser <a href="#" data-sec="playground">Playground</a> &mdash; click <strong>Try in playground</strong> on any example to load it.</p>
+      </div>
+
+      <h2 class="block">Hello, Ethos</h2>
+<pre><span class="kw">say</span> <span class="str">"Hello, Ethos!"</span>.</pre>
+      <p><button class="btn sm" data-try='say "Hello, Ethos!".'>Try in playground ▶</button></p>
+
+      <h2 class="block">Variables and arithmetic</h2>
+<pre><span class="kw">set</span> a <span class="kw">to</span> <span class="num">10</span>.
+<span class="kw">set</span> b <span class="kw">to</span> <span class="num">20</span>.
+<span class="kw">set</span> sum <span class="kw">to</span> a <span class="kw">plus</span> b.
+<span class="kw">say</span> sum.
+
+<span class="kw">set</span> product <span class="kw">to</span> a <span class="kw">times</span> b.
+<span class="kw">say</span> product.
+
+<span class="kw">set</span> power <span class="kw">to</span> a <span class="kw">to the power of</span> <span class="num">2</span>.
+<span class="kw">say</span> power.</pre>
+      <p><button class="btn sm" data-try='set a to 10.
+set b to 20.
+set sum to a plus b.
+say sum.
+
+set product to a times b.
+say product.
+
+set power to a to the power of 2.
+say power.'>Try in playground ▶</button></p>
+
+      <h2 class="block">Input + if / otherwise</h2>
+<pre><span class="kw">ask</span> <span class="str">"What's your name? "</span> <span class="kw">into</span> name.
+<span class="kw">set</span> greeting <span class="kw">to</span> <span class="str">"Hello, "</span>.
+<span class="kw">say</span> greeting.
+<span class="kw">say</span> name.
+
+<span class="kw">set</span> score <span class="kw">to</span> <span class="num">95</span>.
+<span class="kw">if</span> score <span class="kw">is above</span> <span class="num">90</span>.
+  <span class="kw">say</span> <span class="str">"That's an A."</span>.
+<span class="kw">otherwise if</span> score <span class="kw">is at least</span> <span class="num">75</span>.
+  <span class="kw">say</span> <span class="str">"That's a B."</span>.
+<span class="kw">otherwise</span>.
+  <span class="kw">say</span> <span class="str">"Keep going."</span>.
+<span class="kw">end</span>.</pre>
+      <p><button class="btn sm" data-try='ask "What&apos;s your name? " into name.
+set greeting to "Hello, ".
+say greeting.
+say name.
+
+set score to 95.
+if score is above 90.
+  say "That&apos;s an A.".
+otherwise if score is at least 75.
+  say "That&apos;s a B.".
+otherwise.
+  say "Keep going.".
+end.'>Try in playground ▶</button></p>
+
+      <h2 class="block">count loop with step</h2>
+<pre><span class="kw">count from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span> <span class="kw">variable</span> i.
+  <span class="kw">say</span> i.
+<span class="kw">end</span>.
+
+<span class="kw">count from</span> <span class="num">10</span> <span class="kw">to</span> <span class="num">0</span> <span class="kw">variable</span> j <span class="kw">stepping</span> -<span class="num">2</span>.
+  <span class="kw">say</span> j.
+<span class="kw">end</span>.</pre>
+      <p><button class="btn sm" data-try='count from 1 to 5 variable i.
+  say i.
+end.
+
+count from 10 to 0 variable j stepping -2.
+  say j.
+end.'>Try in playground ▶</button></p>
+
+      <h2 class="block">while loop</h2>
+<pre><span class="kw">set</span> lives <span class="kw">to</span> <span class="num">3</span>.
+<span class="kw">while</span> lives <span class="kw">is above</span> <span class="num">0</span>.
+  <span class="kw">say</span> lives.
+  <span class="kw">subtract</span> <span class="num">1</span> <span class="kw">from</span> lives.
+<span class="kw">end</span>.
+<span class="kw">say</span> <span class="str">"Game over."</span>.</pre>
+      <p><button class="btn sm" data-try='set lives to 3.
+while lives is above 0.
+  say lives.
+  subtract 1 from lives.
+end.
+say "Game over.".'>Try in playground ▶</button></p>
+
+      <h2 class="block">Functions</h2>
+<pre><span class="kw">how to</span> greet <span class="kw">with</span> name.
+  <span class="kw">set</span> msg <span class="kw">to</span> <span class="str">"Hello, "</span>.
+  <span class="kw">say</span> msg.
+  <span class="kw">say</span> name.
+<span class="kw">end</span>.
+
+<span class="kw">run</span> greet <span class="kw">with</span> <span class="str">"Aman"</span>.
+
+<span class="kw">how to</span> add <span class="kw">with</span> a, b.
+  <span class="kw">set</span> result <span class="kw">to</span> a <span class="kw">plus</span> b.
+  <span class="kw">say</span> result.
+<span class="kw">end</span>.
+
+<span class="kw">run</span> add <span class="kw">with</span> <span class="num">5</span>, <span class="num">7</span>.</pre>
+      <p><button class="btn sm" data-try='how to greet with name.
+  set msg to "Hello, ".
+  say msg.
+  say name.
+end.
+
+run greet with "Aman".
+
+how to add with a, b.
+  set result to a plus b.
+  say result.
+end.
+
+run add with 5, 7.'>Try in playground ▶</button></p>
+
+      <h2 class="block">String slicing</h2>
+<pre><span class="kw">set</span> name <span class="kw">to</span> <span class="str">"Ethos"</span>.
+<span class="kw">set</span> first <span class="kw">to</span> name <span class="kw">from</span> <span class="num">0</span> <span class="kw">to</span> <span class="num">1</span>.
+<span class="kw">set</span> rest <span class="kw">to</span> name <span class="kw">from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span>.
+<span class="kw">say</span> first.
+<span class="kw">say</span> rest.</pre>
+      <p><button class="btn sm" data-try='set name to "Ethos".
+set first to name from 0 to 1.
+set rest to name from 1 to 5.
+say first.
+say rest.'>Try in playground ▶</button></p>
+
+      <h2 class="block">Type casting</h2>
+<pre><span class="kw">set</span> age_text <span class="kw">to</span> <span class="str">"25"</span>.
+<span class="kw">set</span> age <span class="kw">to</span> age_text <span class="kw">to number</span>.
+<span class="kw">add</span> <span class="num">1</span> <span class="kw">to</span> age.
+<span class="kw">say</span> age.
+
+<span class="kw">set</span> pi_text <span class="kw">to</span> <span class="str">"3.14"</span>.
+<span class="kw">set</span> pi <span class="kw">to</span> pi_text <span class="kw">to decimal</span>.
+<span class="kw">set</span> twice <span class="kw">to</span> pi <span class="kw">times</span> <span class="num">2</span>.
+<span class="kw">say</span> twice.</pre>
+      <p><button class="btn sm" data-try='set age_text to "25".
+set age to age_text to number.
+add 1 to age.
+say age.
+
+set pi_text to "3.14".
+set pi to pi_text to decimal.
+set twice to pi times 2.
+say twice.'>Try in playground ▶</button></p>
+
+      <h2 class="block">Imports (Soft Trait)</h2>
+<pre><span class="kw">bring in</span> math.
+<span class="kw">set</span> pi <span class="kw">to</span> math.pi.
+<span class="kw">say</span> pi.
+
+<span class="kw">set</span> r <span class="kw">to</span> <span class="kw">run function</span> math.sqrt <span class="kw">with</span> <span class="num">16</span>.
+<span class="kw">say</span> r.</pre>
+      <p class="code-caption"># works in local Ethos install; in the browser Playground, math is bundled with Pyodide so it also runs.</p>
+      <p><button class="btn sm" data-try='bring in math.
+set pi to math.pi.
+say pi.
+
+set r to run function math.sqrt with 16.
+say r.'>Try in playground ▶</button></p>
+
+      <h2 class="block">Hard Trait usage &mdash; greetr, greetc, greetcpp</h2>
+      <p>Three sample traits &mdash; one per language &mdash; are verified and on Foundry. Pick whichever language you want to learn from:</p>
+      <div class="install-grid" style="margin:12px 0">
+        <div class="install-card">
+          <h4>greetc <span class="badge opt">verified</span></h4>
+          <p>C sample trait for greet.</p>
+          <div class="cmd">$ forge foundry get greetc</div>
+        </div>
+        <div class="install-card">
+          <h4>greetcpp <span class="badge opt">verified</span></h4>
+          <p>C++ sample trait for greet.</p>
+          <div class="cmd">$ forge foundry get greetcpp</div>
+        </div>
+        <div class="install-card">
+          <h4>greetr <span class="badge opt">verified</span></h4>
+          <p>Rust sample trait for greet.</p>
+          <div class="cmd">$ forge foundry get greetr</div>
+        </div>
+      </div>
+      <p>Then in Ethos &mdash; using <code>greetr</code> as the example:</p>
+<pre><span class="com"># After: forge foundry get greetr</span>
+<span class="kw">bring in</span> greetr.
+<span class="kw">set</span> result <span class="kw">to</span> <span class="kw">run</span> greetr.greet <span class="kw">with</span> <span class="str">"Aman"</span>.
+<span class="kw">say</span> result.</pre>
+      <p class="code-caption"># Hard Traits require a local Ethos install with ctypes &mdash; not available in the browser Playground.</p>
+
+      <div class="foot">
+        <span>Want more? <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">Full language reference</a></span>
+        <span>Try them all: <a href="#" data-sec="playground">Playground</a></span>
+      </div>
+    </section>
+
+    <section id="changelog" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Project</div>
+        <h1>Changelog</h1>
+        <p class="subtitle">All releases published on the <a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">ethos-lang releases page</a>, in reverse chronological order. Each release is signed with GPG key <code>B5690EEEBB952194</code> and verified by GitHub.</p>
+      </div>
+
+      <div class="card info">
+        <h4>All releases</h4>
+        <table>
+          <thead><tr><th>Version</th><th>Date</th><th>Title</th><th>State</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.5.0-beta" target="_blank" rel="noopener"><code>v0.5.0-beta</code></a></td><td>14 Apr 2026</td><td>Major bug fix, Termux support, Hard Trait API</td><td><span class="badge new">latest</span></td></tr>
+            <tr><td><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.4.0-beta" target="_blank" rel="noopener"><code>v0.4.0-beta</code></a></td><td>30 Mar 2026</td><td>The first beta &mdash; macOS support, type casting</td><td><span class="badge req">deprecated</span></td></tr>
+            <tr><td><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.3.0-alpha" target="_blank" rel="noopener"><code>v0.3.0-alpha</code></a></td><td>23 Mar 2026</td><td>Major Linux package manager support</td><td><span class="badge req">alpha</span></td></tr>
+            <tr><td><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.2.0-alpha" target="_blank" rel="noopener"><code>v0.2.0-alpha</code></a></td><td>21 Mar 2026</td><td>Windows support added</td><td><span class="badge req">alpha</span></td></tr>
+            <tr><td><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.1.0-alpha" target="_blank" rel="noopener"><code>v0.1.0-alpha</code></a></td><td>19 Mar 2026</td><td>The Foundation Release</td><td><span class="badge req">alpha</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="block">v0.5.0-beta &mdash; Major bug fix, Termux support, Hard Trait API</h2>
+      <p class="code-caption"># released 14 Apr 2026 &middot; 11 assets &middot; commit c16d82c &middot; GPG signed</p>
+      <p>The v0.5.0-beta release ships major bug fixes alongside two significant additions: Termux support and the completed Hard Trait API.</p>
+      <p>Termux support is available through both the package repository and direct <code>.deb</code> downloads. Due to linker restrictions in the Termux environment, Termux builds require Python and are distributed as a zipapp of the source code. Native Termux binaries will ship after the Rust rewrite.</p>
+      <p>The Hard Trait API is completed with the introduction of Ethos Foundry, the official Hard Trait registry. Foundry is hosted on Cloudflare Pages and GitHub Pages, and provides pre-built hard traits. See <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener">ethos-foundry</a> for details on submitting a trait.</p>
+      <p>This is the final beta release. Bug reports and feature requests are tracked via GitHub issues. The next milestone is the first stable release, followed by the Rust rewrite on a new branch. Windows ARM64 support is also included in this release.</p>
+
+      <h3>What's new</h3>
+      <ul>
+        <li><strong>Termux support</strong> &mdash; available via the Termux repository and via downloadable <code>.deb</code> files.</li>
+        <li><strong>Hard Trait API</strong> &mdash; completed, with Ethos Foundry as the official registry.</li>
+        <li><strong>Windows ARM64</strong> &mdash; support added to the combined installer.</li>
+        <li>Major bug fixes across the transpiler and runtime.</li>
+      </ul>
+
+      <h3>Assets (11)</h3>
+      <table>
+        <thead><tr><th>Asset</th><th>Size</th><th>Platform</th></tr></thead>
+        <tbody>
+          <tr><td><code>ethos-installer-linux-x86_64.tar.gz</code></td><td>26.2 MB</td><td>Linux x86_64</td></tr>
+          <tr><td><code>ethos-linux-x86_64</code></td><td>14.3 MB</td><td>Linux x86_64 (standalone)</td></tr>
+          <tr><td><code>Ethos-macOS-arm64.pkg</code></td><td>10.5 MB</td><td>macOS Apple Silicon</td></tr>
+          <tr><td><code>Ethos-macOS-x86_64.pkg</code></td><td>11.8 MB</td><td>macOS Intel</td></tr>
+          <tr><td><code>ethos-macos-arm64</code></td><td>5.74 MB</td><td>macOS Apple Silicon (standalone)</td></tr>
+          <tr><td><code>ethos-macos-intel-x86_64</code></td><td>6.36 MB</td><td>macOS Intel (standalone)</td></tr>
+          <tr><td><code>Ethos-windows-installer-x86_64.exe</code></td><td>14.4 MB</td><td>Windows x86_64</td></tr>
+          <tr><td><code>Ethos-windows-installer-arm64.exe</code></td><td>13.5 MB</td><td>Windows arm64</td></tr>
+          <tr><td><code>ethos-lang_termux_0.5.0-beta_all.deb</code></td><td>5.93 KB</td><td>Android / Termux</td></tr>
+          <tr><td><code>Source code (zip)</code></td><td>&mdash;</td><td>Source</td></tr>
+          <tr><td><code>Source code (tar.gz)</code></td><td>&mdash;</td><td>Source</td></tr>
+        </tbody>
+      </table>
+      <p><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.5.0-beta" target="_blank" rel="noopener" class="btn sm">View release on GitHub &nearr;</a></p>
+
+      <hr/>
+
+      <h2 class="block">v0.4.0-beta &mdash; The first beta, macOS support, type casting</h2>
+      <p class="code-caption"># released 30 Mar 2026 &middot; 9 assets &middot; commit dd5ae77 &middot; GPG signed</p>
+      <div class="card warn">
+        <h4>Deprecated release</h4>
+        <p>This release was found to contain significant bugs during post-release testing and is no longer recommended. Users should upgrade to v0.5.0-beta or later. It is listed here for historical reference.</p>
+      </div>
+      <p>The v0.4.0-beta release is the first beta for the Ethos language. It introduces official macOS support, fixes several bugs found during testing, and expands Python standard library coverage within the Nuitka-compiled binary. Requests for additional standard library modules can be opened as GitHub issues.</p>
+      <p>Type casting is supported in this release using Ethos's English-like syntax. See the language documentation for details. The release also switches Windows builds from Nuitka onefile mode to standalone mode, which avoids a Windows Defender false positive that flagged onefile builds.</p>
+
+      <h3>What's new</h3>
+      <ul>
+        <li><strong>macOS support</strong> &mdash; officially added for both arm64 and x86_64.</li>
+        <li><strong>Type casting</strong> &mdash; English-like syntax (<code>to number</code>, <code>to decimal</code>, <code>to text</code>, etc.).</li>
+        <li><strong>Expanded Python stdlib</strong> &mdash; additional modules bundled into the Nuitka binary.</li>
+        <li><strong>Standalone Windows builds</strong> &mdash; replaces onefile mode to avoid Windows Defender false positives.</li>
+      </ul>
+      <p><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.4.0-beta" target="_blank" rel="noopener" class="btn sm">View release on GitHub &nearr;</a></p>
+
+      <hr/>
+
+      <h2 class="block">v0.3.0-alpha &mdash; Major Linux package manager support</h2>
+      <p class="code-caption"># released 23 Mar 2026 &middot; 6 assets &middot; commit a64a315 &middot; GPG signed</p>
+      <p>The v0.3.0-alpha release adds <code>-v</code> and <code>--version</code> flags to the Ethos CLI for version detection, and introduces major package manager support for Linux installations. Packages are published via the Open Build Service for supported distributions.</p>
+      <p>If a distribution is not supported by the OBS repository, the universal tarball (<code>ethos-build.tar.gz</code>) can be downloaded and installed via <code>install.sh</code>. The tarball installs both Ethos and Forge; the same applies to the Windows installer.</p>
+
+      <h3>What's new</h3>
+      <ul>
+        <li><strong>Version flags</strong> &mdash; <code>ethos -v</code> and <code>ethos --version</code>.</li>
+        <li><strong>OBS repository</strong> &mdash; packages published at <a href="https://software.opensuse.org/download.html?project=home:AmanCode22&package=ethos-lang" target="_blank" rel="noopener">software.opensuse.org</a> for openSUSE, Arch, Debian, Fedora, openEuler, and Ubuntu.</li>
+        <li><strong>Universal tarball</strong> &mdash; <code>ethos-build.tar.gz</code> with <code>install.sh</code> for unsupported distributions.</li>
+      </ul>
+
+      <h3>Assets (6)</h3>
+      <ul>
+        <li><code>ethos</code> &mdash; 8.4 MB (Linux standalone)</li>
+        <li><code>ethos-build.tar.gz</code> &mdash; 19.6 MB (universal tarball)</li>
+        <li><code>Ethos-windows-installer.exe</code> &mdash; 11.9 MB</li>
+        <li><code>ethos.exe</code> &mdash; 5.41 MB (Windows standalone)</li>
+        <li><code>Source code (zip)</code></li>
+        <li><code>Source code (tar.gz)</code></li>
+      </ul>
+      <p><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.3.0-alpha" target="_blank" rel="noopener" class="btn sm">View release on GitHub &nearr;</a></p>
+
+      <hr/>
+
+      <h2 class="block">v0.2.0-alpha &mdash; Windows support added</h2>
+      <p class="code-caption"># released 21 Mar 2026 &middot; 4 assets &middot; commit 755b72e &middot; GPG signed</p>
+      <p>The v0.2.0-alpha release adds Windows support to the Ethos programming language. The <code>list</code> and <code>dict</code> Python data types are now officially supported and tested, and <code>float</code> support has been added to the language.</p>
+
+      <h3>What's new</h3>
+      <ul>
+        <li><strong>Windows support</strong> &mdash; native Windows installer and standalone binary.</li>
+        <li><strong>list and dict types</strong> &mdash; officially supported and tested.</li>
+        <li><strong>float support</strong> &mdash; added to the type system.</li>
+      </ul>
+
+      <h3>Assets (4)</h3>
+      <ul>
+        <li><code>Ethos-v0.2-windows-installer.exe</code> &mdash; 12 MB</li>
+        <li><code>ethos.exe</code> &mdash; 5.4 MB (standalone)</li>
+        <li><code>Source code (zip)</code></li>
+        <li><code>Source code (tar.gz)</code></li>
+      </ul>
+      <p><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.2.0-alpha" target="_blank" rel="noopener" class="btn sm">View release on GitHub &nearr;</a></p>
+
+      <hr/>
+
+      <h2 class="block">v0.1.0-alpha &mdash; The Foundation Release</h2>
+      <p class="code-caption"># released 19 Mar 2026 &middot; 3 assets &middot; commit 606a90c &middot; GPG signed</p>
+      <p>The v0.1.0-alpha release is the first public alpha of the Ethos programming language. It establishes the core foundation: a natural-language-inspired parser that transpiles human-readable syntax into a Python execution environment.</p>
+
+      <h3>Key features in this alpha</h3>
+      <ul>
+        <li><strong>Natural language parsing</strong> &mdash; support for dynamic math expressions (<code>set x to 5 plus 10</code>), conditional logic (<code>is above</code>, <code>is not</code>), and control flow using explicit <code>end</code> blocks.</li>
+        <li><strong>Interactive I/O</strong> &mdash; fully functional <code>say</code> and the <code>ask "Prompt" into variable</code> syntax.</li>
+        <li><strong>The <code>how to</code> engine</strong> &mdash; define and execute custom functions natively.</li>
+        <li><strong>Hard Trait bindings</strong> &mdash; the core executer dynamically loads compiled C/C++ shared libraries (<code>.so</code>) mapped via <code>manifest.json</code>, bringing native performance into Ethos scripts.</li>
+      </ul>
+
+      <h3>Linux installation (standalone)</h3>
+      <p>The Ethos binary is compiled using Nuitka; Python is not required to run it. Download the <code>ethos</code> binary, make it executable, and run a script:</p>
+<pre>chmod +x ethos
+./ethos run script.ethos</pre>
+      <p>Windows and macOS native binaries are planned for later releases. Non-Linux users can run Ethos directly from the Python source code. Android (Termux) builds are planned after the project reaches a stable release.</p>
+
+      <h3>Assets (3)</h3>
+      <ul>
+        <li><code>ethos</code> &mdash; Linux standalone binary</li>
+        <li><code>Source code (zip)</code></li>
+        <li><code>Source code (tar.gz)</code></li>
+      </ul>
+      <p><a href="https://github.com/AmanCode22/ethos-lang/releases/tag/v0.1.0-alpha" target="_blank" rel="noopener" class="btn sm">View release on GitHub &nearr;</a></p>
+
+      <h2 class="block">Roadmap</h2>
+      <div class="card warn">
+        <h4>Planned &mdash; pending testers</h4>
+        <ul>
+          <li><strong>First stable release</strong> &mdash; v0.5.0-beta is the final beta. If no major issues are reported, it will be promoted to stable without changes.</li>
+          <li><strong>Rust rewrite</strong> &mdash; begins on a new branch after the first stable release. Goals: performance, memory safety, and behavioural parity with the Python version.</li>
+          <li><strong>Termux prebuilt binaries</strong> &mdash; will ship after the Rust rewrite lands. Until then, Termux runs the Python source as a zipapp.</li>
+        </ul>
+        <p style="margin-top:12px"><strong>Not currently planned:</strong> LSP, VSCode extensions, GUI IDE.</p>
+      </div>
+
+      <div class="foot">
+        <span>All releases signed with GPG key <code>B5690EEEBB952194</code> (verified by GitHub).</span>
+        <span><a href="https://github.com/AmanCode22/ethos-lang/releases" target="_blank" rel="noopener">View all releases on GitHub &nearr;</a></span>
+      </div>
+    </section>
+
+    <section id="contributing" class="section">
+      <a href="#" class="back-btn" data-sec="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>Back to Overview</a>
+      <div class="section-head">
+        <div class="eyebrow">Project</div>
+        <h1>Contributing</h1>
+        <p class="subtitle">Ethos is a solo project maintained by me (Class 9, India). Contributions are welcome &mdash; especially Hard Trait SDK bindings for new languages, bug reports, and fixes. The rules below are mechanical; they're applied without judgement calls on every PR.</p>
+      </div>
+
+      <div class="status-banner">
+        <div class="ic">!</div>
+        <div>
+          <strong>Ethos needs testers.</strong>
+          <p>
+            Development is paused due to a lack of testers. If you can test the current version &mdash; especially if you're a beginner starting programming &mdash; send a Reddit DM to
+            <a href="https://www.reddit.com/user/AmanCode22" target="_blank" rel="noopener"><strong>u/AmanCode22</strong></a>.
+            With enough testers, development and the Rust rewrite will restart.
+          </p>
+        </div>
+      </div>
+
+      <h2 class="block">Rule 1 &mdash; The PR rules are the Foundry rules</h2>
+      <div class="card info">
+        <h4>One rule set, applied everywhere</h4>
+        <p>The same rules apply to Foundry PRs, template repos, and Ethos itself. The rule is:</p>
+        <ul>
+          <li><strong>All 8 platforms must be supported.</strong> Linux x86_64, Linux ARM64, macOS Intel, macOS Apple Silicon, Windows x86_64, Windows arm64, Termux ARM64, Termux ARMv7.</li>
+          <li><strong>If you cannot support a platform, open an issue first.</strong> Explain why on <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener"><code>ethos-foundry</code></a> (for traits) or the relevant repo (for everything else). Wait for a response. <em>Then</em> open your PR.</li>
+          <li><strong>PRs that skip the issue-first step are rejected.</strong> No exceptions, no judgement calls &mdash; this is mechanical.</li>
+        </ul>
+      </div>
+
+      <h2 class="block">Rule 2 &mdash; Templates are required</h2>
+      <p>Hard Traits must be built from one of the official templates:</p>
+      <table>
+        <thead><tr><th>Template</th><th>Language</th><th>Use for</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-c-template" target="_blank" rel="noopener"><code>ethos-trait-c-template</code></a></td><td>C + CMake</td><td>Simplest FFI</td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-cpp-template" target="_blank" rel="noopener"><code>ethos-trait-cpp-template</code></a></td><td>C++ + CMake</td><td>Use <code>extern "C"</code> for exports</td></tr>
+          <tr><td><a href="https://github.com/AmanCode22/ethos-trait-rust-template" target="_blank" rel="noopener"><code>ethos-trait-rust-template</code></a></td><td>Rust + Cargo</td><td>Use <code>#[no_mangle] extern "C"</code></td></tr>
+        </tbody>
+      </table>
+      <div class="card warn">
+        <h4>Want a template for another language?</h4>
+        <p>If you want to contribute an API for a language other than C / C++ / Rust (e.g. Go, Zig, Java), <strong>open an issue first</strong> on <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener"><code>ethos-foundry</code></a> with a link to your template repo containing the API similar to the above templates. Once reviewed and accepted, it will be linked from the Foundry README. Do not open a PR with a new language binding without an issue first.</p>
+      </div>
+
+      <h2 class="block">Rule 3 &mdash; PR required per version bump</h2>
+      <p>Every version bump requires a new PR to Foundry. Don't edit manifests in-place. The flow:</p>
+      <ol class="steps">
+        <li>Update your trait repo and tag a new release (e.g. <code>v2.0.0</code>).</li>
+        <li>CI builds new binaries for all 8 platforms and uploads them to GitHub Releases.</li>
+        <li>The workflow auto-creates a new <code>manifest.json</code> for the PR &mdash; use that one, not the one in your source repo (they are different).</li>
+        <li>Open a PR to <code>ethos-foundry</code> with the updated manifest.</li>
+        <li>I review and merge. Users get the latest version via <code>forge foundry get</code>.</li>
+      </ol>
+
+      <h2 class="block">Rule 4 &mdash; No binaries in repos</h2>
+      <p>Binaries live on GitHub Releases, not in source repos. PRs containing binaries (in the trait repo or in Foundry) are rejected. All URLs in manifests must be public, and SHA256 checksums are mandatory for every platform entry.</p>
+
+      <h2 class="block">Rule 5 &mdash; Trait name must match folder name</h2>
+      <p>The <code>name</code> field in <code>manifest.json</code> must match the folder name (and the repo name). For example, <code>ethos-trait-mymath</code> &rarr; <code>name: "mymath"</code> &rarr; same name used in <code>CMakeLists.txt</code> first line as project name. PRs with mismatched names are rejected.</p>
+
+      <h2 class="block">Rule 6 &mdash; Public license only</h2>
+      <p>MIT, Apache-2.0, etc. No proprietary licenses accepted on Foundry. The trait's <code>license</code> field in the manifest must match the <code>LICENSE</code> file in the source repo.</p>
+
+      <h2 class="block">Where to contribute</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="icon">⬡</div>
+          <h4>Foundry &mdash; Hard Traits</h4>
+          <p>Submit new Hard Traits or version bumps. Follow the 8-platform rule. <a href="https://github.com/AmanCode22/ethos-foundry" target="_blank" rel="noopener">Open PR &nearr;</a></p>
+        </div>
+        <div class="feature">
+          <div class="icon">◆</div>
+          <h4>Trait templates</h4>
+          <p>Improve the C / C++ / Rust starter templates. New languages require an issue first. <a href="https://github.com/AmanCode22/ethos-trait-c-template" target="_blank" rel="noopener">C template &nearr;</a></p>
+        </div>
+        <div class="feature">
+          <div class="icon">⚙</div>
+          <h4>Forge &mdash; package manager</h4>
+          <p>Bug reports and fixes. The Rust rewrite is paused but the Python version is open. <a href="https://github.com/AmanCode22/forge" target="_blank" rel="noopener">Open issue &nearr;</a></p>
+        </div>
+        <div class="feature">
+          <div class="icon">{ }</div>
+          <h4>Ethos language</h4>
+          <p>Lexer, parser, runtime, stdlib shims. Open an issue before starting large features. <a href="https://github.com/AmanCode22/ethos-lang" target="_blank" rel="noopener">Open issue &nearr;</a></p>
+        </div>
+        <div class="feature">
+          <div class="icon">✎</div>
+          <h4>Documentation</h4>
+          <p>Improve DOCS.md, BUILDING.md, STDLIB_SHIMS.md, install guides. PRs welcome. <a href="https://github.com/AmanCode22/ethos-lang/blob/main/DOCS.md" target="_blank" rel="noopener">DOCS.md &nearr;</a></p>
+        </div>
+        <div class="feature">
+          <div class="icon">🧪</div>
+          <h4>Be a tester</h4>
+          <p>Most valuable contribution right now. Test Ethos as a beginner and report bugs. <a href="https://www.reddit.com/user/AmanCode22" target="_blank" rel="noopener">DM u/AmanCode22 &nearr;</a></p>
+        </div>
+      </div>
+
+      <h2 class="block">Quick checklist before opening a PR</h2>
+      <div class="card success checklist-card">
+        <ul class="checklist" style="margin:0;list-style:none;padding-left:0">
+          <li><input type="checkbox" disabled /> <span>If your PR touches platforms: all 8 are supported, or an issue was opened first explaining the exception.</span></li>
+          <li><input type="checkbox" disabled /> <span>If your PR is a Hard Trait: built from an official template (C / C++ / Rust).</span></li>
+          <li><input type="checkbox" disabled /> <span>Folder name matches <code>manifest.name</code> matches repo name.</span></li>
+          <li><input type="checkbox" disabled /> <span>No binaries in the PR &mdash; only source and manifest.</span></li>
+          <li><input type="checkbox" disabled /> <span>All URLs in the manifest are public; SHA256 checksums are present for every platform.</span></li>
+          <li><input type="checkbox" disabled /> <span>License is public (MIT, Apache-2.0, etc.).</span></li>
+          <li><input type="checkbox" disabled /> <span>If this is a version bump: a new PR was opened, not an in-place edit.</span></li>
+          <li><input type="checkbox" disabled /> <span>If this is a new language binding: an issue was opened on <code>ethos-foundry</code> first and accepted.</span></li>
+        </ul>
+      </div>
+
+      <h2 class="block">Communication</h2>
+      <ul>
+        <li><strong>GitHub issues</strong> &mdash; primary channel for bugs, feature requests, platform exceptions, and new-language-binding requests.</li>
+        <li><strong>Reddit DM</strong> &mdash; <a href="https://www.reddit.com/user/AmanCode22" target="_blank" rel="noopener">u/AmanCode22</a> &mdash; for testers and direct contact.</li>
+        <li><strong>Open an issue before starting large features</strong> to avoid duplicate work.</li>
+      </ul>
+
+      <div class="card purple">
+        <h4>Why the rules are strict</h4>
+        <p>Ethos is a solo project reviewed by one person. Mechanical rules &mdash; all 8 platforms, templates required, issue-first for exceptions &mdash; keep the review load manageable and ensure every user on every device can use every trait. The strictness is what makes the ecosystem trustworthy, not a barrier to entry.</p>
+      </div>
+
+      <div class="foot">
+        <span>License: MIT. Free to use, free to contribute.</span>
+        <span>Built by me &mdash; Aman Adlakha (Class 9, India). Solo project; every PR reviewed personally.</span>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+<script>
+
+(function () {
+  const buttons = document.querySelectorAll('.nav-btn');
+  const sections = document.querySelectorAll('.section');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('backdrop');
+  const burger = document.getElementById('burger');
+
+  function activate(name, push) {
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.sec === name));
+    sections.forEach(s => s.classList.toggle('active', s.id === name));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (push) history.replaceState(null, '', '#' + name);
+
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('show');
+
+    if (name === 'playground') setTimeout(ensurePyodide, 200);
+  }
+
+  buttons.forEach(b => b.addEventListener('click', () => activate(b.dataset.sec, true)));
+
+  document.querySelectorAll('[data-sec]').forEach(el => {
+    if (el.tagName === 'BUTTON') return;
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      activate(el.dataset.sec, true);
+    });
+  });
+
+  const hash = location.hash.slice(1);
+  if (hash && document.getElementById(hash)) activate(hash, false);
+  else activate('overview', false);
+
+  burger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    backdrop.classList.toggle('show');
+  });
+  backdrop.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('show');
+  });
+})();
+
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function toast(msg, kind) {
+  toastEl.className = 'toast ' + (kind || 'info') + ' show';
+  toastEl.textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3200);
+}
+
+let pyodide = null;
+let pyodideLoading = false;
+let ethosSourceLoaded = false;
+const pgStatus = document.getElementById('pgStatus');
+
+const ETHOS_LEXER_URL = 'https://raw.githubusercontent.com/AmanCode22/ethos-lang/main/src/ethos/lexer.py';
+const ETHOS_PARSER_URL = 'https://raw.githubusercontent.com/AmanCode22/ethos-lang/main/src/ethos/parser.py';
+
+async function fetchText(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('Failed to fetch ' + url + ': ' + resp.status);
+  return await resp.text();
+}
+
+async function ensurePyodide() {
+  if (pyodide && ethosSourceLoaded) return pyodide;
+  if (pyodideLoading) {
+    while (pyodideLoading) await new Promise(r => setTimeout(r, 80));
+    return pyodide;
+  }
+  pyodideLoading = true;
+  pgStatus.className = 'pg-status loading';
+  pgStatus.textContent = 'pyodide: loading…';
+  try {
+    pyodide = await loadPyodide();
+
+    const [lexerSrc, parserSrc] = await Promise.all([
+      fetchText(ETHOS_LEXER_URL),
+      fetchText(ETHOS_PARSER_URL),
+    ]);
+
+    pyodide.globals.set('LEXER_SRC', lexerSrc);
+    pyodide.globals.set('PARSER_SRC', parserSrc);
+
+    pyodide.runPython(`
+import os, sys
+os.makedirs('/src', exist_ok=True)
+with open('/src/lexer.py', 'w') as f:
+    f.write(LEXER_SRC)
+with open('/src/parser.py', 'w') as f:
+    f.write(PARSER_SRC)
+if '/src' not in sys.path:
+    sys.path.insert(0, '/src')
+from lexer import lex, split_sentences, tokenize_and_normalize
+from parser import parse
+`);
+
+    ethosSourceLoaded = true;
+    pgStatus.className = 'pg-status ready';
+    pgStatus.textContent = 'pyodide: ready';
+    document.getElementById('btnRun').disabled = false;
+    document.getElementById('btnLex').disabled = false;
+    document.getElementById('btnPy').disabled = false;
+    toast('Pyodide ready', 'success');
+  } catch (e) {
+    pgStatus.className = 'pg-status error';
+    pgStatus.textContent = 'pyodide: failed';
+    toast('Failed to load: ' + e.message, 'error');
+    console.error('[ethos] load error:', e);
+  } finally {
+    pyodideLoading = false;
+  }
+  return pyodide;
+}
+
+async function runRealEthos(src) {
+  const py = await ensurePyodide();
+  if (!py || !ethosSourceLoaded) throw new Error('Pyodide or ethos source not ready');
+
+  py.globals.set('ETHOS_SRC', src);
+  py.runPython(`
+import json
+_result = None
+try:
+    _tokens = lex(ETHOS_SRC)
+    _python_code = parse(_tokens, False, False)
+    _flat_tokens = []
+    for _i, _sent in enumerate(_tokens, 1):
+        for _tok in _sent:
+            _flat_tokens.append({"value": _tok, "sentence": _i})
+    _result = json.dumps({"tokens": _flat_tokens, "python": _python_code, "error": None})
+except Exception as _e:
+    _result = json.dumps({"tokens": [], "python": "", "error": str(_e)})
+`);
+  const result = py.globals.get('_result');
+  if (typeof result !== 'string') throw new Error('Ethos returned no result');
+  return JSON.parse(result);
+}
+
+async function runPythonCapture(pythonCode) {
+  const py = await ensurePyodide();
+  if (!py) throw new Error('Pyodide not ready');
+  let captured = '';
+  py.setStdout({ batched: (s) => { captured += s + '\n'; } });
+  py.setStderr({ batched: (s) => { captured += s + '\n'; } });
+  await py.runPythonAsync(pythonCode);
+  return captured.replace(/\n$/, '');
+}
+
+const editor = document.getElementById('editor');
+const output = document.getElementById('output');
+const outModeLabel = document.getElementById('outMode');
+const srcInfo = document.getElementById('srcInfo');
+
+const EXAMPLES = {
+  hello: 'say "Hello, Ethos!".',
+  ask: 'ask "What\'s your name? " into name.\nset greeting to "Hello, ".\nsay greeting.\nsay name.\n\nset score to 95.\nif score is above 90.\n  say "That\'s an A.".\notherwise if score is at least 75.\n  say "That\'s a B.".\notherwise.\n  say "Keep going.".\nend.',
+  count: 'count from 1 to 5 variable i.\n  say i.\nend.\n\ncount from 10 to 0 variable j stepping -2.\n  say j.\nend.',
+  while: 'set lives to 3.\nwhile lives is above 0.\n  say lives.\n  subtract 1 from lives.\nend.\nsay "Game over.".',
+  fn: 'how to greet with name.\n  set msg to "Hello, ".\n  say msg.\n  say name.\nend.\n\nrun greet with "Aman".\n\nhow to add with a, b.\n  set result to a plus b.\n  say result.\nend.\n\nrun add with 5, 7.',
+  slice: 'set name to "Ethos".\nset first to name from 0 to 1.\nset rest to name from 1 to 5.\nsay first.\nsay rest.',
+  cast: 'set age_text to "25".\nset age to age_text to number.\nadd 1 to age.\nsay age.\n\nset pi_text to "3.14".\nset pi to pi_text to decimal.\nset twice to pi times 2.\nsay twice.',
+};
+
+function setEditor(text) {
+  editor.textContent = text;
+  updateSrcInfo();
+}
+function updateSrcInfo() {
+  const lines = (editor.textContent || '').split('\n').length;
+  srcInfo.textContent = lines + ' lines';
+}
+editor.addEventListener('input', updateSrcInfo);
+
+try {
+  const stored = sessionStorage.getItem('ethosPlaygroundCode');
+  if (stored) { setEditor(stored); sessionStorage.removeItem('ethosPlaygroundCode'); }
+  else setEditor(EXAMPLES.hello);
+} catch (e) { setEditor(EXAMPLES.hello); }
+
+document.querySelectorAll('.examples-row .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    setEditor(EXAMPLES[chip.dataset.example] || '');
+    toast('Loaded: ' + chip.dataset.example, 'info');
+  });
+});
+
+let currentOutMode = 'stdout';
+document.querySelectorAll('.out-mode-bar button').forEach(b => {
+  b.addEventListener('click', () => {
+    currentOutMode = b.dataset.out;
+    document.querySelectorAll('.out-mode-bar button').forEach(x => x.classList.toggle('active', x === b));
+    outModeLabel.textContent = currentOutMode;
+    refreshOutput();
+  });
+});
+
+let lastTokens = null;
+let lastPython = null;
+let lastStdout = null;
+
+function refreshOutput() {
+  if (currentOutMode === 'stdout') {
+    output.innerHTML = escapeHtml(lastStdout || '(no output yet — press Run)');
+    output.style.color = lastStdout ? 'var(--success)' : 'var(--fg-muted)';
+  } else if (currentOutMode === 'tokens') {
+    if (!lastTokens) { output.innerHTML = '<span style="color:var(--fg-muted)">Press Tokenize to see tokens.</span>'; return; }
+    const rows = lastTokens.map(t => {
+      const cls = t.quoted ? 'tok-str' : ({
+        'say': 'tok-kw', 'set': 'tok-kw', 'add': 'tok-kw', 'subtract': 'tok-kw',
+        'ask': 'tok-kw', 'if': 'tok-kw', 'otherwise': 'tok-kw', 'end': 'tok-kw',
+        'repeat': 'tok-kw', 'count': 'tok-kw', 'while': 'tok-kw', 'how to': 'tok-kw',
+        'run': 'tok-kw', 'bring in': 'tok-kw', 'note': 'tok-com',
+        'is': 'tok-op', 'is not': 'tok-op', 'is above': 'tok-op', 'is below': 'tok-op',
+        'is at least': 'tok-op', 'is at most': 'tok-op',
+        'plus': 'tok-op', 'minus': 'tok-op', 'times': 'tok-op', 'divided by': 'tok-op',
+        'to the power of': 'tok-op',
+      })[t.value] || 'tok-var';
+      const val = t.quoted ? '"' + t.value + '"' : t.value;
+      return '<tr><td class="' + cls + '">' + escapeHtml(val) + '</td><td>' + (t.quoted ? 'STRING' : 'WORD') + '</td><td>' + t.sentence + '</td></tr>';
+    }).join('');
+    output.innerHTML = '<table><thead><tr><th>value</th><th>kind</th><th>sent.</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    output.style.color = 'var(--fg)';
+  } else if (currentOutMode === 'python') {
+    output.innerHTML = (lastPython ? '<pre style="background:transparent;border:none;padding:0;margin:0;color:var(--fg)">' + escapeHtml(lastPython) + '</pre>' : '<span style="color:var(--fg-muted)">Press Show Python to see the transpiled output.</span>');
+    output.style.color = 'var(--fg)';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('btnLex').addEventListener('click', async () => {
+  const src = editor.textContent || '';
+  pgStatus.textContent = 'tokenizing…';
+  try {
+    const result = await runRealEthos(src);
+    if (result.error) {
+      lastTokens = [];
+      toast('Lexer error: ' + result.error, 'error');
+      pgStatus.textContent = 'pyodide: ready';
+      return;
+    }
+    lastTokens = result.tokens;
+    lastPython = result.python;
+    currentOutMode = 'tokens';
+    document.querySelectorAll('.out-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.out === 'tokens'));
+    outModeLabel.textContent = 'tokens';
+    refreshOutput();
+    toast(result.tokens.length + ' tokens (real lexer)', 'success');
+  } catch (e) {
+    toast('Error: ' + e.message, 'error');
+  } finally {
+    if (ethosSourceLoaded) pgStatus.textContent = 'pyodide: ready';
+  }
+});
+
+document.getElementById('btnPy').addEventListener('click', async () => {
+  const src = editor.textContent || '';
+  pgStatus.textContent = 'transpiling…';
+  try {
+    const result = await runRealEthos(src);
+    if (result.error) {
+      toast('Parser error: ' + result.error, 'error');
+      pgStatus.textContent = 'pyodide: ready';
+      return;
+    }
+    lastPython = result.python;
+    lastTokens = result.tokens;
+    currentOutMode = 'python';
+    document.querySelectorAll('.out-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.out === 'python'));
+    outModeLabel.textContent = 'python';
+    refreshOutput();
+    toast('Transpiled via real parser', 'success');
+  } catch (e) {
+    toast('Error: ' + e.message, 'error');
+  } finally {
+    if (ethosSourceLoaded) pgStatus.textContent = 'pyodide: ready';
+  }
+});
+
+document.getElementById('btnRun').addEventListener('click', async () => {
+  const src = editor.textContent || '';
+  pgStatus.textContent = 'running…';
+  try {
+    const result = await runRealEthos(src);
+    if (result.error) {
+      lastStdout = '[ethos error]\n' + result.error;
+      currentOutMode = 'stdout';
+      document.querySelectorAll('.out-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.out === 'stdout'));
+      outModeLabel.textContent = 'stdout';
+      refreshOutput();
+      toast('Ethos error', 'error');
+      return;
+    }
+    lastPython = result.python;
+    lastTokens = result.tokens;
+
+    const stdout = await runPythonCapture(result.python);
+    lastStdout = stdout || '(no output)';
+    currentOutMode = 'stdout';
+    document.querySelectorAll('.out-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.out === 'stdout'));
+    outModeLabel.textContent = 'stdout';
+    refreshOutput();
+    toast('Run complete (real ethos)', 'success');
+  } catch (e) {
+    lastStdout = '[runtime error]\n' + e.message;
+    currentOutMode = 'stdout';
+    document.querySelectorAll('.out-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.out === 'stdout'));
+    outModeLabel.textContent = 'stdout';
+    refreshOutput();
+    toast('Runtime error', 'error');
+  } finally {
+    if (ethosSourceLoaded) pgStatus.textContent = 'pyodide: ready';
+  }
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  lastStdout = null; lastTokens = null; lastPython = null;
+  refreshOutput();
+  toast('Output cleared', 'info');
+});
+
+editor.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    document.execCommand('insertText', false, '  ');
+  }
+});
+
+document.querySelectorAll('[data-try]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    try { sessionStorage.setItem('ethosPlaygroundCode', btn.getAttribute('data-try')); } catch (e) {}
+
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === 'playground'));
+    document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'playground'));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    history.replaceState(null, '', '#playground');
+    setTimeout(() => {
+      const stored = sessionStorage.getItem('ethosPlaygroundCode');
+      if (stored) { setEditor(stored); sessionStorage.removeItem('ethosPlaygroundCode'); }
+      ensurePyodide();
+    }, 100);
+  });
+});
+
+setTimeout(() => toast('Ready. Open the Playground to load Pyodide.', 'info'), 600);
+</script>
+
+</body>
+</html>
