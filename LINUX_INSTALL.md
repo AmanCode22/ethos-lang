@@ -20,7 +20,7 @@ Automatic updates via your package manager.
 | Fedora 42/43/Rawhide | aarch64, x86_64 |
 | openEuler 24.03 | aarch64, x86_64 |
 | openSUSE Factory/Tumbleweed/Slowroll | aarch64, armv7l, i586, x86_64 |
-| Ubuntu 24.04/25.04/25.10 | x86_64 |
+| Ubuntu 24.04/25.04/25.10/26.04 | x86_64 |
 
 `ethos-lang` recommends `ethos-forge` (optional package manager).
 
