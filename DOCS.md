@@ -1,6 +1,9 @@
 # Ethos — Language Reference
+Ethos can be tried online at any of the following links:
+- https://ethos-lang.pages.dev/
+- https://amancode22.github.io/ethos-lang/
 
-Complete syntax reference. Covers lexer, parser, runtime, and Hard Trait format.
+This is complete syntax reference. Covers lexer, parser, runtime, and Hard Trait format.
 
 ## Contents
 
