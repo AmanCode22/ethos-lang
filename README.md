@@ -13,6 +13,11 @@ Ethos transpiles English-like syntax to Python. Every statement ends with a peri
 
 I built this solo. Class 9 student from India.
 
+You can try Ethos in live playground at any one of following
+- https://ethos-lang.pages.dev/
+- https://amancode22.github.io/ethos-lang/
+
+  
 ## Rust Rewrite in progress stopped
 Ethos was started being rewritten in rust but due to lack of testers I am stopping it also.
 
