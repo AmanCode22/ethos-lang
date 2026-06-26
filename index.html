@@ -2237,8 +2237,8 @@ let pyodideLoading = false;
 let ethosSourceLoaded = false;
 const pgStatus = document.getElementById('pgStatus');
 
-const ETHOS_LEXER_URL = 'https://raw.githubusercontent.com/AmanCode22/ethos-lang/main/src/ethos/lexer.py';
-const ETHOS_PARSER_URL = 'https://raw.githubusercontent.com/AmanCode22/ethos-lang/main/src/ethos/parser.py';
+const ETHOS_LEXER_URL = 'src/ethos/lexer.py';
+const ETHOS_PARSER_URL = 'src/ethos//parser.py';
 
 async function fetchText(url) {
   const resp = await fetch(url);
