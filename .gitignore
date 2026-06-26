@@ -5,3 +5,10 @@ main.dist
 main.onefile-build
 __pycache__
 src/ethos/__pycache__
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
