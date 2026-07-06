@@ -1,7 +1,7 @@
 # Ethos — Language Reference
 Ethos can be tried online at any of the following links:
 - https://ethos-lang.pages.dev/
-- https://amancode22.github.io/ethos-lang/
+- https://amancode22.github.io/ethos-lang-playground/
 
 This is complete syntax reference. Covers lexer, parser, runtime, and Hard Trait format.
 
