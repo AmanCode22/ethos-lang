@@ -1,4 +1,4 @@
-# Project Stopped
+# Project Halted
 Due to lack of testers I am halting developement of Ethos and all it's components, if I would get testers I would restart the developement and would start rust rewrite.
 If you want to test then send me reddit dm to username AmanCode22.
 Testers who can test current version and can help me finding bugs and issues in my code by testing it. I need some begineers who are starting proggraming to try out Ethos and need their reviews.
@@ -6,6 +6,16 @@ Testers who can test current version and can help me finding bugs and issues in 
 
 # Ethos
 <img src="ethos_logo.png" alt="Ethos Logo" width="500">
+<a href="https://peerpush.com/p/ethos"
+  target="_blank"
+  rel="noopener"
+>
+  <img
+    src="https://peerpush.com/p/ethos/badge.png"
+    alt="Ethos on PeerPush"
+    style="width: 230px;"
+  />
+</a><br>
 
 **A language that speaks for itself.**
 
